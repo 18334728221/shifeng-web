@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- 物流信息 -->
+<mapper namespace="CraftsmanLogistics">
+	
+	<resultMap id="craftsmanLogisticsResult" type="CraftsmanLogistics">
+        <result property="id" column="ID"/>
+        <result property="orderNo" column="ORDER_NO"/>
+        <result property="customerNo" column="CUSTOMER_NO"/>
+        <result property="trackingNo" column="TRACKING_NO"/>
+        <result property="logisticsInformation" column="LOGISTICS_INFORMATION"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID,
+        	ORDER_NO,
+        	CUSTOMER_NO,
+        	TRACKING_NO,
+        	LOGISTICS_INFORMATION
+	    ]]>
+	</sql>
+	
+	<sql id="commonAliasColumns">
+	    <![CDATA[
+        	x.ID,
+        	x.ORDER_NO,
+        	x.CUSTOMER_NO,
+        	x.TRACKING_NO,
+        	x.LOGISTICS_INFORMATION
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="CraftsmanLogistics">
+    <![CDATA[
+        INSERT INTO craftsman_logistics (
+        	ID,
+        	ORDER_NO,
+        	CUSTOMER_NO,
+        	TRACKING_NO,
+        	LOGISTICS_INFORMATION
+        ) VALUES (
+        	#{id},
+        	#{orderNo},
+        	#{customerNo},
+        	#{trackingNo},
+        	#{logisticsInformation}
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" parameterType="CraftsmanLogistics">
+    <![CDATA[
+        UPDATE craftsman_logistics SET
+	        ORDER_NO = #{orderNo},
+	        CUSTOMER_NO = #{customerNo},
+	        TRACKING_NO = #{trackingNo},
+	        LOGISTICS_INFORMATION = #{logisticsInformation}
+        WHERE 
+	        ID = #{id}
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from craftsman_logistics
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from craftsman_logistics where ID IN 
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach> 
+    </delete>
+    
+    <delete id="batchDeleteByLocalId" parameterType="list">
+        delete from craftsman_logistics where LOCAL_ID in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}		</foreach> 
+    </delete>
+    
+    <select id="getById" resultMap="craftsmanLogisticsResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM craftsman_logistics 
+	        WHERE 
+		        ID = #{id}
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="craftsmanLogisticsResult">
+		SELECT <include refid="commonColumns" />
+		FROM craftsman_logistics WHERE ID IN 
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(orderNo)">
+				AND ORDER_NO = #{orderNo}
+			</if>
+	       <if test="@Ognl@isNotEmpty(customerNo)">
+				AND CUSTOMER_NO = #{customerNo}
+			</if>
+	       <if test="@Ognl@isNotEmpty(trackingNo)">
+				AND TRACKING_NO = #{trackingNo}
+			</if>
+	       <if test="@Ognl@isNotEmpty(logisticsInformation)">
+				AND LOGISTICS_INFORMATION = #{logisticsInformation}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM craftsman_logistics 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="craftsmanLogisticsResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) as id
+    	</if>
+	    FROM craftsman_logistics 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	
+</mapper>
+

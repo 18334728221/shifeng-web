@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- 顾客表 -->
+<mapper namespace="Customer">
+	
+	<resultMap id="customerResult" type="Customer">
+        <result property="id" column="ID"/>
+        <result property="customerNo" column="CUSTOMER_NO"/>
+        <result property="name" column="NAME"/>
+        <result property="password" column="PASSWORD"/>
+        <result property="accountPassword" column="ACCOUNT_PASSWORD"/>
+        <result property="nickName" column="NICK_NAME"/>
+        <result property="mobile" column="MOBILE"/>
+        <result property="homeAddress" column="HOME_ADDRESS"/>
+        <result property="birthday" column="BIRTHDAY"/>
+        <result property="sex" column="SEX"/>
+        <result property="imageId" column="IMAGE_ID"/>
+        <result property="imageServerId" column="IMAGE_SERVER_ID"/>
+        <result property="areaPlatMark" column="AREA_PLAT_MARK"/>
+        <result property="wxId" column="WX_ID"/>
+        <result property="weixin" column="WEIXIN"/>
+        <result property="qq" column="QQ"/>
+        <result property="email" column="EMAIL"/>
+        <result property="identityCardNo" column="IDENTITY_CARD_NO"/>
+        <result property="userType" column="USER_TYPE"/>
+        <result property="sectionNo" column="SECTION_NO"/>
+        <result property="isTrader" column="IS_TRADER"/>
+        <result property="buyCommissionRate" column="BUY_COMMISSION_RATE"/>
+        <result property="sellCommissionRate" column="SELL_COMMISSION_RATE"/>
+        <result property="buyPoundageRate" column="BUY_POUNDAGE_RATE"/>
+        <result property="sellPoundageRate" column="SELL_POUNDAGE_RATE"/>
+        <result property="isAutoWithdrawal" column="IS_AUTO_WITHDRAWAL"/>
+        <result property="level" column="LEVEL"/>
+        <result property="growthValue" column="GROWTH_VALUE"/>
+        <result property="isAuthentication" column="IS_AUTHENTICATION"/>
+        <result property="isAccountPwd" column="IS_ACCOUNT_PWD"/>
+        <result property="localId" column="LOCAL_ID"/>
+        <result property="description" column="DESCRIPTION"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="status" column="STATUS"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID,
+        	CUSTOMER_NO,
+        	NAME,
+        	PASSWORD,
+        	ACCOUNT_PASSWORD,
+        	NICK_NAME,
+        	MOBILE,
+        	HOME_ADDRESS,
+        	BIRTHDAY,
+        	SEX,
+        	IMAGE_ID,
+        	IMAGE_SERVER_ID,
+        	AREA_PLAT_MARK,
+        	WX_ID,
+        	WEIXIN,
+        	QQ,
+        	EMAIL,
+        	IDENTITY_CARD_NO,
+        	USER_TYPE,
+        	SECTION_NO,
+        	IS_TRADER,
+        	BUY_COMMISSION_RATE,
+        	SELL_COMMISSION_RATE,
+        	BUY_POUNDAGE_RATE,
+        	SELL_POUNDAGE_RATE,
+        	IS_AUTO_WITHDRAWAL,
+        	LEVEL,
+        	GROWTH_VALUE,
+        	IS_AUTHENTICATION,
+        	IS_ACCOUNT_PWD,
+        	LOCAL_ID,
+        	DESCRIPTION,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STATUS
+	    ]]>
+	</sql>
+	
+	<sql id="commonAliasColumns">
+	    <![CDATA[
+        	x.ID,
+        	x.CUSTOMER_NO,
+        	x.NAME,
+        	x.PASSWORD,
+        	x.ACCOUNT_PASSWORD,
+        	x.NICK_NAME,
+        	x.MOBILE,
+        	x.HOME_ADDRESS,
+        	x.BIRTHDAY,
+        	x.SEX,
+        	x.IMAGE_ID,
+        	x.IMAGE_SERVER_ID,
+        	x.AREA_PLAT_MARK,
+        	x.WX_ID,
+        	x.WEIXIN,
+        	x.QQ,
+        	x.EMAIL,
+        	x.IDENTITY_CARD_NO,
+        	x.USER_TYPE,
+        	x.SECTION_NO,
+        	x.IS_TRADER,
+        	x.BUY_COMMISSION_RATE,
+        	x.SELL_COMMISSION_RATE,
+        	x.BUY_POUNDAGE_RATE,
+        	x.SELL_POUNDAGE_RATE,
+        	x.IS_AUTO_WITHDRAWAL,
+        	x.LEVEL,
+        	x.GROWTH_VALUE,
+        	x.IS_AUTHENTICATION,
+        	x.IS_ACCOUNT_PWD,
+        	x.LOCAL_ID,
+        	x.DESCRIPTION,
+        	x.CREATE_TIME,
+        	x.UPDATE_TIME,
+        	x.STATUS
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="Customer">
+    <![CDATA[
+        INSERT INTO customer (
+        	ID,
+        	CUSTOMER_NO,
+        	NAME,
+        	PASSWORD,
+        	ACCOUNT_PASSWORD,
+        	NICK_NAME,
+        	MOBILE,
+        	HOME_ADDRESS,
+        	BIRTHDAY,
+        	SEX,
+        	IMAGE_ID,
+        	IMAGE_SERVER_ID,
+        	AREA_PLAT_MARK,
+        	WX_ID,
+        	WEIXIN,
+        	QQ,
+        	EMAIL,
+        	IDENTITY_CARD_NO,
+        	USER_TYPE,
+        	SECTION_NO,
+        	IS_TRADER,
+        	BUY_COMMISSION_RATE,
+        	SELL_COMMISSION_RATE,
+        	BUY_POUNDAGE_RATE,
+        	SELL_POUNDAGE_RATE,
+        	IS_AUTO_WITHDRAWAL,
+        	LEVEL,
+        	GROWTH_VALUE,
+        	IS_AUTHENTICATION,
+        	IS_ACCOUNT_PWD,
+        	LOCAL_ID,
+        	DESCRIPTION,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STATUS
+        ) VALUES (
+        	#{id},
+        	#{customerNo},
+        	#{name},
+        	#{password},
+        	#{accountPassword},
+        	#{nickName},
+        	#{mobile},
+        	#{homeAddress},
+        	#{birthday},
+        	#{sex},
+        	#{imageId},
+        	#{imageServerId},
+        	#{areaPlatMark},
+        	#{wxId},
+        	#{weixin},
+        	#{qq},
+        	#{email},
+        	#{identityCardNo},
+        	#{userType},
+        	#{sectionNo},
+        	#{isTrader},
+        	#{buyCommissionRate},
+        	#{sellCommissionRate},
+        	#{buyPoundageRate},
+        	#{sellPoundageRate},
+        	#{isAutoWithdrawal},
+        	#{level},
+        	#{growthValue},
+        	#{isAuthentication},
+        	#{isAccountPwd},
+        	#{localId},
+        	#{description},
+        	#{createTime},
+        	#{updateTime},
+        	#{status}
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" parameterType="Customer">
+    <![CDATA[
+        UPDATE customer SET
+	        CUSTOMER_NO = #{customerNo},
+	        NAME = #{name},
+	        PASSWORD = #{password},
+	        ACCOUNT_PASSWORD = #{accountPassword},
+	        NICK_NAME = #{nickName},
+	        MOBILE = #{mobile},
+	        HOME_ADDRESS = #{homeAddress},
+	        BIRTHDAY = #{birthday},
+	        SEX = #{sex},
+	        IMAGE_ID = #{imageId},
+	        IMAGE_SERVER_ID = #{imageServerId},
+	        AREA_PLAT_MARK = #{areaPlatMark},
+	        WX_ID = #{wxId},
+	        WEIXIN = #{weixin},
+	        QQ = #{qq},
+	        EMAIL = #{email},
+	        IDENTITY_CARD_NO = #{identityCardNo},
+	        USER_TYPE = #{userType},
+	        SECTION_NO = #{sectionNo},
+	        IS_TRADER = #{isTrader},
+	        BUY_COMMISSION_RATE = #{buyCommissionRate},
+        	SELL_COMMISSION_RATE = #{sellCommissionRate},
+        	BUY_POUNDAGE_RATE = #{buyPoundageRate},
+        	SELL_POUNDAGE_RATE = #{sellPoundageRate},
+	        IS_AUTO_WITHDRAWAL = #{isAutoWithdrawal},
+	        LEVEL = #{level},
+	        GROWTH_VALUE = #{growthValue},
+	        IS_AUTHENTICATION = #{isAuthentication},
+	        IS_ACCOUNT_PWD = #{isAccountPwd},
+	        LOCAL_ID = #{localId},
+	        DESCRIPTION = #{description},
+	        CREATE_TIME = #{createTime},
+	        UPDATE_TIME = #{updateTime},
+	        STATUS = #{status}
+        WHERE 
+	        ID = #{id}
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from customer
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from customer where ID IN 
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}        
+		</foreach> 
+    </delete>
+    
+    <delete id="batchDeleteByLocalId" parameterType="list">
+        delete from customer where LOCAL_ID in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}		
+		</foreach> 
+    </delete>
+    
+    <select id="getById" resultMap="customerResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM customer 
+	        WHERE 
+		        ID = #{id}
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="customerResult">
+		SELECT <include refid="commonColumns" />
+		FROM customer WHERE ID IN 
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}        
+		</foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(customerNo)">
+				AND CUSTOMER_NO = #{customerNo}
+			</if>
+	       <if test="@Ognl@isNotEmpty(name)">
+				AND NAME = #{name}
+			</if>
+	       <if test="@Ognl@isNotEmpty(password)">
+				AND PASSWORD = #{password}
+			</if>
+	       <if test="@Ognl@isNotEmpty(nickName)">
+				AND NICK_NAME = #{nickName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(mobile)">
+				AND MOBILE = #{mobile}
+			</if>
+	       <if test="@Ognl@isNotEmpty(homeAddress)">
+				AND HOME_ADDRESS = #{homeAddress}
+			</if>
+	       <if test="@Ognl@isNotEmpty(birthday)">
+				AND BIRTHDAY = #{birthday}
+			</if>
+	       <if test="@Ognl@isNotEmpty(sex)">
+				AND SEX = #{sex}
+			</if>
+	       <if test="@Ognl@isNotEmpty(imageId)">
+				AND IMAGE_ID = #{imageId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(imageServerId)">
+				AND IMAGE_SERVER_ID = #{imageServerId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(areaPlatMark)">
+				AND AREA_PLAT_MARK = #{areaPlatMark}
+			</if>
+	       <if test="@Ognl@isNotEmpty(wxId)">
+				AND WX_ID = #{wxId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(weixin)">
+				AND WEIXIN = #{weixin}
+			</if>
+	       <if test="@Ognl@isNotEmpty(qq)">
+				AND QQ = #{qq}
+			</if>
+	       <if test="@Ognl@isNotEmpty(email)">
+				AND EMAIL = #{email}
+			</if>
+	       <if test="@Ognl@isNotEmpty(identityCardNo)">
+				AND IDENTITY_CARD_NO = #{identityCardNo}
+			</if>
+	       <if test="@Ognl@isNotEmpty(userType)">
+				AND USER_TYPE = #{userType}
+			</if>
+	       <if test="@Ognl@isNotEmpty(sectionNo)">
+				AND SECTION_NO = #{sectionNo}
+			</if>
+			 <if test="@Ognl@isNotEmpty(isTrader)">
+				AND IS_TRADER = #{isTrader}
+			</if>
+	       <if test="@Ognl@isNotEmpty(buyCommissionRate)">
+				AND BUY_COMMISSION_RATE = #{buyCommissionRate}
+			</if>
+			<if test="@Ognl@isNotEmpty(sellCommissionRate)">
+				AND SELL_COMMISSION_RATE = #{sellCommissionRate}
+			</if>
+			<if test="@Ognl@isNotEmpty(buyPoundageRate)">
+				AND BUY_POUNDAGE_RATE = #{buyPoundageRate}
+			</if>
+			<if test="@Ognl@isNotEmpty(sellPoundageRate)">
+				AND SELL_POUNDAGE_RATE = #{sellPoundageRate}
+			</if>
+	       <if test="@Ognl@isNotEmpty(isAutoWithdrawal)">
+				AND IS_AUTO_WITHDRAWAL = #{isAutoWithdrawal}
+			</if>
+	       <if test="@Ognl@isNotEmpty(level)">
+				AND LEVEL = #{level}
+			</if>
+			<if test="@Ognl@isNotEmpty(isAuthentication)">
+				AND IS_AUTHENTICATION = #{isAuthentication}
+			</if>
+			<if test="@Ognl@isNotEmpty(isAccountPwd)">
+				AND IS_ACCOUNT_PWD = #{isAccountPwd}
+			</if>
+	       <if test="@Ognl@isNotEmpty(localId)">
+				AND LOCAL_ID = #{localId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(description)">
+				AND DESCRIPTION = #{description}
+			</if>
+	       <if test="@Ognl@isNotEmpty(createTimeBegin)">
+				AND CREATE_TIME >= #{createTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(createTimeEnd)">
+				AND CREATE_TIME &lt;= #{createTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(updateTimeBegin)">
+				AND UPDATE_TIME >= #{updateTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(updateTimeEnd)">
+				AND UPDATE_TIME &lt;= #{updateTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(status)">
+				AND STATUS = #{status}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM customer 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="customerResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) as id
+    	</if>
+	    FROM customer 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	<select id="getCustomerByEmailOrMobile" resultMap="customerResult" parameterType="map">
+    	SELECT <include refid="commonColumns" /> 
+    	FROM customer WHERE 1=1
+	     AND (MOBILE = #{principal} OR EMAIL = #{principal})
+	    <if test="@Ognl@isNotEmpty(areaPlatMark)">
+	   		AND AREA_PLAT_MARK = #{areaPlatMark} 
+	    </if>
+    </select>
+   	<!--  查询最后一条数据 -->
+    <select id="findLastCustomer" resultMap="customerResult">
+    	SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM  customer ORDER BY ID desc LIMIT 1 
+	    ]]>
+    </select>
+   	<!--  查询申购参与积分人数 -->
+    <select id="findPurchaseNum" resultMap="customerResult">
+    	SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM  customer ORDER BY GROWTH_VALUE  desc LIMIT #{purchaseNum} 
+	    ]]>
+    </select>
+    
+    <!--  查询申购参与积分人数 -->
+    <select id="getGrowthByPurchaseFront" resultType="long" parameterType="map">
+    	SELECT SUM(GROWTH_VALUE) AS GROWTH_VALUE
+    	FROM customer c
+    	WHERE EXISTS 
+    	(SELECT ID FROM product_purchase p where c.CUSTOMER_NO = p.CUSTOMER_NO AND p.PRODUCT_CODE = #{productCode})
+    	ORDER BY GROWTH_VALUE DESC LIMIT #{integralNum}
+    </select>
+    
+    <select id="findByPurchaseFront" resultMap="customerResult" parameterType="map">
+    	SELECT <include refid="commonColumns" />
+    	FROM customer c
+    	WHERE EXISTS 
+    	(SELECT ID FROM product_purchase p where c.CUSTOMER_NO = p.CUSTOMER_NO AND p.PRODUCT_CODE = #{productCode})
+    	ORDER BY GROWTH_VALUE DESC LIMIT #{integralNum}
+    </select>
+</mapper>
+

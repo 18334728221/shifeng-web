@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- 交易订单 -->
+<mapper namespace="TradeOrder">
+	
+	<resultMap id="tradeOrderResult" type="TradeOrder">
+        <result property="id" column="ID"/>
+        <result property="txNo" column="TX_NO"/>
+        <result property="customerNo" column="CUSTOMER_NO"/>
+        <result property="productName" column="PRODUCT_NAME"/>
+        <result property="productCode" column="PRODUCT_CODE"/>
+        <result property="entrustTime" column="ENTRUST_TIME"/>
+        <result property="tradeMark" column="TRADE_MARK"/>
+        <result property="entrustPrice" column="ENTRUST_PRICE"/>
+        <result property="entrustNumber" column="ENTRUST_NUMBER"/>
+        <result property="entrustCode" column="ENTRUST_CODE"/>
+        <result property="turnoverQuantity" column="TURNOVER_QUANTITY"/>
+        <result property="priceMethod" column="PRICE_METHOD"/>
+        <result property="entrustMethod" column="ENTRUST_METHOD"/>
+        <result property="tradeStatus" column="TRADE_STATUS"/>
+        <result property="isCancel" column="IS_CANCEL"/>
+        <result property="cancelStatus" column="CANCEL_STATUS"/>
+        <result property="cancelNumber" column="CANCEL_NUMBER"/>    
+        <result property="poundage" column="POUNDAGE"/>
+        <result property="accumulatedPoundage" column="ACCUMULATED_POUNDAGE"/>
+        <result property="accumulatedFund" column="ACCUMULATED_FUND"/>
+        <result property="totalFund" column="TOTAL_FUND"/>
+        <result property="fromWithdrawCash" column="FROM_WITHDRAW_CASH"/>
+        <result property="stockSellFund" column="STOCK_SELL_FUND"/>
+       	<result property="isTradeTime" column="IS_TRADE_TIME"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="status" column="STATUS"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID,
+        	TX_NO,
+        	CUSTOMER_NO,
+        	PRODUCT_NAME,
+        	PRODUCT_CODE,
+        	ENTRUST_TIME,
+        	TRADE_MARK,
+        	ENTRUST_PRICE,
+        	ENTRUST_NUMBER,
+        	ENTRUST_CODE,
+        	TURNOVER_QUANTITY,
+        	PRICE_METHOD,
+        	ENTRUST_METHOD,
+        	TRADE_STATUS,
+        	IS_CANCEL,
+        	CANCEL_STATUS,
+        	CANCEL_NUMBER,
+        	POUNDAGE,
+        	ACCUMULATED_POUNDAGE,
+        	ACCUMULATED_FUND,
+        	TOTAL_FUND,
+        	FROM_WITHDRAW_CASH,
+        	STOCK_SELL_FUND,
+        	IS_TRADE_TIME,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STATUS
+	    ]]>
+	</sql>
+	
+	<sql id="commonAliasColumns">
+	    <![CDATA[
+        	x.ID,
+        	x.TX_NO,
+        	x.CUSTOMER_NO,
+        	x.PRODUCT_NAME,
+        	x.PRODUCT_CODE,
+        	x.ENTRUST_TIME,
+        	x.TRADE_MARK,
+        	x.ENTRUST_PRICE,
+        	x.ENTRUST_NUMBER,
+        	x.ENTRUST_CODE,
+        	x.TURNOVER_QUANTITY,
+        	x.PRICE_METHOD,
+        	x.ENTRUST_METHOD,
+        	x.TRADE_STATUS,
+        	x.IS_CANCEL,
+        	x.CANCEL_STATUS,
+        	x.CANCEL_NUMBER,
+        	x.POUNDAGE,
+        	x.ACCUMULATED_POUNDAGE,
+        	x.ACCUMULATED_FUND,
+        	x.TOTAL_FUND,
+        	x.FROM_WITHDRAW_CASH,
+        	x.STOCK_SELL_FUND,
+        	x.IS_TRADE_TIME,
+        	x.CREATE_TIME,
+        	x.UPDATE_TIME,
+        	x.STATUS
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" parameterType="TradeOrder">
+        INSERT INTO trade_order (
+        	TX_NO,
+        	CUSTOMER_NO,
+        	PRODUCT_NAME,
+        	PRODUCT_CODE,
+        	ENTRUST_TIME,
+        	TRADE_MARK,
+        	ENTRUST_PRICE,
+        	ENTRUST_NUMBER,
+        	ENTRUST_CODE,
+        	TURNOVER_QUANTITY,
+        	PRICE_METHOD,
+        	ENTRUST_METHOD,
+        	TRADE_STATUS,
+        	IS_CANCEL,
+        	CANCEL_STATUS,
+        	CANCEL_NUMBER,
+        	POUNDAGE,
+        	ACCUMULATED_POUNDAGE,
+        	ACCUMULATED_FUND,
+        	TOTAL_FUND,
+        	FROM_WITHDRAW_CASH,
+        	STOCK_SELL_FUND,
+        	IS_TRADE_TIME,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STATUS
+        ) VALUES (
+            #{txNo},
+        	#{customerNo},
+        	#{productName},
+        	#{productCode},
+        	#{entrustTime},
+        	#{tradeMark},
+        	#{entrustPrice},
+        	#{entrustNumber},
+        	#{entrustCode},
+        	#{turnoverQuantity},
+        	#{priceMethod},
+        	#{entrustMethod},
+        	#{tradeStatus},
+        	#{isCancel},
+        	#{cancelStatus},
+        	#{cancelNumber},
+        	#{poundage},
+        	#{accumulatedPoundage},
+        	#{accumulatedFund},
+        	#{totalFund},
+        	#{fromWithdrawCash},
+        	#{stockSellFund},
+        	#{isTradeTime},
+        	#{createTime},
+        	#{updateTime},
+        	#{status}
+        )
+        <selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID() AS ID
+        </selectKey>
+	</insert>
+	
+	<insert id="insertBatch" parameterType="list">
+		<selectKey resultType="long" keyProperty="id" order="AFTER"> 
+			SELECT LAST_INSERT_ID() AS ID
+		</selectKey>
+		INSERT INTO trade_order (
+			TX_NO,
+        	CUSTOMER_NO,
+        	PRODUCT_NAME,
+        	PRODUCT_CODE,
+        	ENTRUST_TIME,
+        	TRADE_MARK,
+        	ENTRUST_PRICE,
+        	ENTRUST_NUMBER,
+        	ENTRUST_CODE,
+        	TURNOVER_QUANTITY,
+        	PRICE_METHOD,
+        	ENTRUST_METHOD,
+        	TRADE_STATUS,
+        	IS_CANCEL,
+        	CANCEL_STATUS,
+        	CANCEL_NUMBER,
+        	POUNDAGE,
+        	ACCUMULATED_POUNDAGE,
+        	ACCUMULATED_FUND,
+        	TOTAL_FUND,
+        	FROM_WITHDRAW_CASH,
+        	STOCK_SELL_FUND,
+        	IS_TRADE_TIME,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STATUS
+        ) VALUES
+        <foreach collection ="list" item="o" index= "index" separator =",">
+            (	
+            	#{o.txNo},
+	           	#{o.customerNo},
+	        	#{o.productName},
+	        	#{o.productCode},
+	        	#{o.entrustTime},
+	        	#{o.tradeMark},
+	        	#{o.entrustPrice},
+	        	#{o.entrustNumber},
+	        	#{o.entrustCode},
+	        	#{o.turnoverQuantity},
+	        	#{o.priceMethod},
+	        	#{o.entrustMethod},
+	        	#{o.tradeStatus},
+	        	#{o.isCancel},
+        		#{o.cancelStatus},
+        		#{o.cancelNumber},
+        		#{o.poundage},
+        		#{o.accumulatedPoundage},
+        		#{o.accumulatedFund},
+        		#{o.totalFund},
+        		#{o.fromWithdrawCash},
+        		#{o.stockSellFund},
+        		#{o.isTradeTime},
+	        	#{o.createTime},
+	        	#{o.updateTime},
+	        	#{o.status}
+            )
+        </foreach >
+	</insert>
+    
+	<update id="update" parameterType="TradeOrder">
+    <![CDATA[
+        UPDATE trade_order SET
+        	TX_NO = #{txNo},
+	        CUSTOMER_NO = #{customerNo},
+	        PRODUCT_NAME = #{productName},
+	        PRODUCT_CODE = #{productCode},
+	        ENTRUST_TIME = #{entrustTime},
+	        TRADE_MARK = #{tradeMark},
+	        ENTRUST_PRICE = #{entrustPrice},
+	        ENTRUST_NUMBER = #{entrustNumber},
+	        ENTRUST_CODE = #{entrustCode},
+	        TURNOVER_QUANTITY = #{turnoverQuantity},
+	        PRICE_METHOD = #{priceMethod},
+	        ENTRUST_METHOD = #{entrustMethod},
+	        TRADE_STATUS = #{tradeStatus},
+	        IS_CANCEL = #{isCancel},
+       		CANCEL_STATUS = #{cancelStatus},
+       		CANCEL_NUMBER = #{cancelNumber},
+       		POUNDAGE = #{poundage},
+       		ACCUMULATED_POUNDAGE = #{accumulatedPoundage},
+       		ACCUMULATED_FUND = #{accumulatedFund},
+       		TOTAL_FUND =  #{totalFund},
+        	FROM_WITHDRAW_CASH = #{fromWithdrawCash},
+        	STOCK_SELL_FUND = #{stockSellFund},
+        	IS_TRADE_TIME = #{isTradeTime},
+	        UPDATE_TIME = #{updateTime},
+	        STATUS = #{status}
+        WHERE 
+	        ID = #{id}
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from trade_order
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from trade_order where ID IN 
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}        
+		</foreach> 
+    </delete>
+    
+    <delete id="batchDeleteByLocalId" parameterType="list">
+        delete from trade_order where LOCAL_ID in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}		
+		</foreach> 
+    </delete>
+    
+    <select id="getById" resultMap="tradeOrderResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM trade_order 
+	        WHERE 
+		        ID = #{id}
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="tradeOrderResult">
+		SELECT <include refid="commonColumns" />
+		FROM trade_order WHERE ID IN 
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}        
+		</foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+			<if test="@Ognl@isNotEmpty(txNo)">
+				AND TX_NO = #{txNo}
+			</if>
+	       <if test="@Ognl@isNotEmpty(customerNo)">
+				AND CUSTOMER_NO = #{customerNo}
+			</if>
+	       <if test="@Ognl@isNotEmpty(productName)">
+				AND PRODUCT_NAME = #{productName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(productCode)">
+				AND PRODUCT_CODE = #{productCode}
+			</if>
+	       <if test="@Ognl@isNotEmpty(entrustTimeBegin)">
+				AND ENTRUST_TIME >= #{entrustTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(entrustTimeEnd)">
+				AND ENTRUST_TIME &lt;= #{entrustTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(tradeMark)">
+				AND TRADE_MARK = #{tradeMark}
+			</if>
+	       <if test="@Ognl@isNotEmpty(entrustPrice)">
+				AND ENTRUST_PRICE = #{entrustPrice}
+			</if>
+	       <if test="@Ognl@isNotEmpty(entrustNumber)">
+				AND ENTRUST_NUMBER = #{entrustNumber}
+			</if>
+	       <if test="@Ognl@isNotEmpty(entrustCode)">
+				AND ENTRUST_CODE = #{entrustCode}
+			</if>
+	       <if test="@Ognl@isNotEmpty(turnoverQuantity)">
+				AND TURNOVER_QUANTITY = #{turnoverQuantity}
+			</if>
+	       <if test="@Ognl@isNotEmpty(priceMethod)">
+				AND PRICE_METHOD = #{priceMethod}
+			</if>
+	       <if test="@Ognl@isNotEmpty(entrustMethod)">
+				AND ENTRUST_METHOD = #{entrustMethod}
+			</if>
+	       <if test="@Ognl@isNotEmpty(tradeStatus)">
+				AND TRADE_STATUS = #{tradeStatus}
+			</if> 
+			<if test="@Ognl@isNotEmpty(lowerTradeStatus)">
+				AND TRADE_STATUS &lt;= #{lowerTradeStatus}
+			</if> 
+       		<if test="@Ognl@isNotEmpty(isCancel)">
+				AND IS_CANCEL = #{isCancel}
+			</if>
+			<if test="@Ognl@isNotEmpty(cancelStatus)">
+				AND CANCEL_STATUS = #{tradeStatus}
+			</if>
+			<if test="@Ognl@isNotEmpty(cancelNumber)">
+				AND CANCEL_NUMBER = #{cancelNumber}
+			</if>
+        	<if test="@Ognl@isNotEmpty(totalFund)">
+				AND TOTAL_FUND = #{totalFund}
+			</if>
+			<if test="@Ognl@isNotEmpty(fromWithdrawCash)">
+				AND FROM_WITHDRAW_CASH = #{fromWithdrawCash}
+			</if>
+			<if test="@Ognl@isNotEmpty(stockSellFund)">
+				AND STOCK_SELL_FUND = #{stockSellFund}
+			</if>
+			<if test="@Ognl@isNotEmpty(isTradeTime)">
+				AND IS_TRADE_TIME = #{isTradeTime}
+			</if>
+	       <if test="@Ognl@isNotEmpty(createTimeBegin)">
+				AND CREATE_TIME >= #{createTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(createTimeEnd)">
+				AND CREATE_TIME &lt;= #{createTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(updateTimeBegin)">
+				AND UPDATE_TIME >= #{updateTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(updateTimeEnd)">
+				AND UPDATE_TIME &lt;= #{updateTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(status)">
+				AND STATUS = #{status}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM trade_order 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="tradeOrderResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) as id
+    	</if>
+	    FROM trade_order 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+    
+    <!-- 查询当前用户成交记录(最近100条记录) -->
+	 <select id="findSuccess" resultMap="tradeOrderResult" parameterType="map">
+    	SELECT <include refid="commonColumns" />
+	    FROM trade_order 
+		WHERE STATUS = 1
+	    <if test="productCode">
+	   		AND PRODUCT_CODE = #{productCode} 
+	    </if>
+		ORDER BY ID DESC LIMIT 100
+    </select>
+    
+     <update id="updateAsCancel" parameterType="map">
+    	UPDATE trade_order SET
+        IS_CANCEL = 1,
+        CANCEL_NUMBER = ENTRUST_NUMBER - TURNOVER_QUANTITY,
+        TRADE_STATUS = #{tradeStatus},
+        UPDATE_TIME = now()
+        WHERE TRADE_STATUS &lt;= #{lowerTradeStatus} AND IS_TRADE_TIME = #{isTradeTime}
+    </update>
+	
+</mapper>
+

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="AuthModule">
+	
+	<resultMap id="authModuleResult" type="AuthModule">
+        <result property="id" column="ID"/>
+        <result property="moduleName" column="MODULE_NAME"/>
+        <result property="parentId" column="PARENT_ID"/>
+        <result property="controlLevel" column="CONTROL_LEVEL"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID ,
+        	MODULE_NAME ,
+        	PARENT_ID ,
+        	CONTROL_LEVEL
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="AuthModule">
+    <![CDATA[
+        INSERT INTO auth_module (
+        	ID ,
+        	MODULE_NAME ,
+        	PARENT_ID ,
+        	CONTROL_LEVEL
+        ) VALUES (
+        	#{id} ,
+        	#{moduleName} ,
+        	#{parentId} ,
+        	#{controlLevel}
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" parameterType="AuthModule">
+    <![CDATA[
+        UPDATE auth_module SET
+	        MODULE_NAME = #{moduleName} ,
+	        PARENT_ID = #{parentId} ,
+	        CONTROL_LEVEL = #{controlLevel}
+        WHERE 
+	        ID = #{id} 
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from auth_module
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from auth_module where id in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}        
+		</foreach> 
+    </delete>  
+	
+	<select id="getByIds" resultMap="authModuleResult">
+		SELECT <include refid="commonColumns" />
+		FROM auth_module WHERE ID IN
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}        
+		</foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(moduleName)">
+				AND MODULE_NAME LIKE concat('%', #{moduleName}, '%')
+			</if>
+	       <if test="@Ognl@isNotEmpty(parentId)">
+				AND PARENT_ID = #{parentId}
+			</if>
+			<if test="@Ognl@isNotEmpty(controlLevel)">
+				AND CONTROL_LEVEL = #{controlLevel}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM auth_module 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="authModuleResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) AS ID 
+    	</if>
+	    FROM auth_module 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	
+</mapper>
+

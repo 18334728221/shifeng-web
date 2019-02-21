@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- 评价表 -->
+<mapper namespace="Evaluate">
+	
+	<resultMap id="evaluateResult" type="Evaluate">
+        <result property="id" column="ID"/>
+        <result property="customerNo" column="CUSTOMER_NO"/>
+        <result property="productCode" column="PRODUCT_CODE"/>
+        <result property="satisfyLevel" column="SATISFY_LEVEL"/>
+		<result property="serveLevel" column="SERVE_LEVEL"/>
+		<result property="logisticsLevel" column="LOGISTICS_LEVEL"/>
+        <result property="thumbsUpNumber" column="THUMBS_UP_NUMBER"/>
+        <result property="description" column="DESCRIPTION"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="status" column="STATUS"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID,
+        	CUSTOMER_NO,
+        	PRODUCT_CODE,
+        	SATISFY_LEVEL,
+			SERVE_LEVEL,
+			LOGISTICS_LEVEL,
+        	THUMBS_UP_NUMBER,
+        	DESCRIPTION,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STATUS
+	    ]]>
+	</sql>
+	
+	<sql id="commonAliasColumns">
+	    <![CDATA[
+        	x.ID,
+        	x.CUSTOMER_NO,
+        	x.PRODUCT_CODE,
+        	x.SATISFY_LEVEL,
+			x.SERVE_LEVEL,
+			x.LOGISTICS_LEVEL,
+        	x.THUMBS_UP_NUMBER,
+        	x.DESCRIPTION,
+        	x.CREATE_TIME,
+        	x.UPDATE_TIME,
+        	x.STATUS
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="Evaluate">
+	<![CDATA[
+        INSERT INTO evaluate (
+        	ID,
+        	CUSTOMER_NO,
+        	PRODUCT_CODE,
+        	SATISFY_LEVEL,
+			SERVE_LEVEL,
+			LOGISTICS_LEVEL,
+        	THUMBS_UP_NUMBER,
+        	DESCRIPTION,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STATUS
+        ) VALUES (
+        	#{id},
+        	#{customerNo},
+        	#{productCode},
+        	#{satisfyLevel},
+			#{serveLevel},
+			#{logisticsLevel},
+        	#{thumbsUpNumber},
+        	#{description},
+        	#{createTime},
+        	#{updateTime},
+        	#{status}
+        )
+        ]]> 
+	</insert>
+    
+	<update id="update" parameterType="Evaluate">
+    <![CDATA[
+        UPDATE evaluate SET
+	        CUSTOMER_NO = #{customerNo},
+	        PRODUCT_CODE = #{productCode},
+	       	SATISFY_LEVEL = #{satisfyLevel},
+			SERVE_LEVEL = #{serveLevel},
+			LOGISTICS_LEVEL = #{logisticsLevel},
+	        THUMBS_UP_NUMBER = #{thumbsUpNumber},
+	        DESCRIPTION = #{description},
+	        CREATE_TIME = #{createTime},
+	        UPDATE_TIME = #{updateTime},
+	        STATUS = #{status}
+        WHERE 
+	        ID = #{id}
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from evaluate
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from evaluate where ID IN 
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach> 
+    </delete>
+    
+    <delete id="batchDeleteByLocalId" parameterType="list">
+        delete from evaluate where LOCAL_ID in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}		</foreach> 
+    </delete>
+    
+    <select id="getById" resultMap="evaluateResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM evaluate 
+	        WHERE 
+		        ID = #{id}
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="evaluateResult">
+		SELECT <include refid="commonColumns" />
+		FROM evaluate WHERE ID IN 
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(customerNo)">
+				AND CUSTOMER_NO = #{customerNo}
+			</if>
+	       <if test="@Ognl@isNotEmpty(productCode)">
+				AND PRODUCT_CODE = #{productCode}
+			</if>
+			
+	       <if test="@Ognl@isNotEmpty(satisfyLevel)">
+				AND SATISFY_LEVEL = #{satisfyLevel}
+			</if>
+			<if test="@Ognl@isNotEmpty(serveLevel)">
+				AND SERVE_LEVEL = #{serveLevel}
+			</if>
+			<if test="@Ognl@isNotEmpty(logisticsLevel)">
+				AND LOGISTICS_LEVEL = #{logisticsLevel}
+			</if>
+	       <if test="@Ognl@isNotEmpty(thumbsUpNumber)">
+				AND THUMBS_UP_NUMBER = #{thumbsUpNumber}
+			</if>
+	       <if test="@Ognl@isNotEmpty(description)">
+				AND DESCRIPTION = #{description}
+			</if>
+	       <if test="@Ognl@isNotEmpty(createTimeBegin)">
+				AND CREATE_TIME >= #{createTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(createTimeEnd)">
+				AND CREATE_TIME &lt;= #{createTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(updateTimeBegin)">
+				AND UPDATE_TIME >= #{updateTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(updateTimeEnd)">
+				AND UPDATE_TIME &lt;= #{updateTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(status)">
+				AND STATUS = #{status}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM evaluate WHERE STATUS=1
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="evaluateResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) as id
+    	</if>
+	    FROM evaluate WHERE STATUS=1
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	
+</mapper>
+

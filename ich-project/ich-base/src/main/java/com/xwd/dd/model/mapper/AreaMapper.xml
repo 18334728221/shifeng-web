@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- Area -->
+<mapper namespace="Area">
+	
+	<resultMap id="areaResult" type="Area">
+        <result property="id" column="ID"/>
+        <result property="areaName" column="AREA_NAME"/>
+        <result property="areaCode" column="AREA_CODE"/>
+        <result property="parentId" column="PARENT_ID"/>
+        <result property="platMark" column="PLAT_MARK"/>
+        <result property="level" column="LEVEL"/>
+        <result property="cityLevel" column="CITY_LEVEL"/>
+        <result property="regional" column="REGIONAL"/>
+        <result property="isExpand" column="IS_EXPAND"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID,
+        	AREA_NAME,
+        	AREA_CODE,
+        	PARENT_ID,
+        	PLAT_MARK,
+        	LEVEL,
+        	CITY_LEVEL,
+        	REGIONAL,
+        	IS_EXPAND
+	    ]]>
+	</sql>
+	
+	<sql id="commonAliasColumns">
+	    <![CDATA[
+        	x.ID,
+        	x.AREA_NAME,
+        	x.AREA_CODE,
+        	x.PARENT_ID,
+        	x.PLAT_MARK,
+        	x.LEVEL,
+        	x.CITY_LEVEL,
+        	x.REGIONAL,
+        	x.IS_EXPAND
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="Area">
+    <![CDATA[
+        INSERT INTO dd_area (
+        	ID,
+        	AREA_NAME,
+        	AREA_CODE,
+        	PARENT_ID,
+        	PLAT_MARK,
+        	LEVEL,
+        	CITY_LEVEL,
+        	REGIONAL,
+        	IS_EXPAND
+        ) VALUES (
+        	#{id},
+        	#{areaName},
+        	#{areaCode},
+        	#{parentId},
+        	#{platMark},
+        	#{level},
+        	#{cityLevel},
+        	#{regional},
+        	#{isExpand}
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" parameterType="Area">
+    <![CDATA[
+        UPDATE dd_area SET
+	        AREA_NAME = #{areaName},
+	        AREA_CODE = #{areaCode},
+	        PARENT_ID = #{parentId},
+	        PLAT_MARK = #{platMark},
+	        LEVEL = #{level},
+	        CITY_LEVEL = #{cityLevel},
+	        REGIONAL = #{regional},
+	        IS_EXPAND = #{isExpand}
+        WHERE 
+	        ID = #{id}
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from dd_area
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from dd_area where ID IN 
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach> 
+    </delete>
+    
+    <delete id="batchDeleteByLocalId" parameterType="list">
+        delete from dd_area where LOCAL_ID in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}		</foreach> 
+    </delete>
+    
+    <select id="getById" resultMap="areaResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM dd_area 
+	        WHERE 
+		        ID = #{id}
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="areaResult">
+		SELECT <include refid="commonColumns" />
+		FROM dd_area WHERE ID IN 
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}        
+		</foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(areaName)">
+				AND AREA_NAME = #{areaName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(areaCode)">
+				AND AREA_CODE = #{areaCode}
+			</if>
+	       <if test="@Ognl@isNotEmpty(parentId)">
+				AND PARENT_ID = #{parentId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(platMark)">
+				AND PLAT_MARK = #{platMark}
+			</if>
+	       <if test="@Ognl@isNotEmpty(level)">
+				AND LEVEL = #{level}
+			</if>
+			<if test="@Ognl@isNotEmpty(cityLevel)">
+				AND CITY_LEVEL = #{cityLevel}
+			</if>
+	       <if test="@Ognl@isNotEmpty(regional)">
+				AND REGIONAL = #{regional}
+			</if>
+	       <if test="@Ognl@isNotEmpty(isExpand)">
+				AND IS_EXPAND = #{isExpand}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM dd_area 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="areaResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) as id
+    	</if>
+	    FROM dd_area 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+</mapper>
+

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- 银行账户表 -->
+<mapper namespace="AccountBank">
+	
+	<resultMap id="bankResult" type="AccountBank">
+        <result property="id" column="ID"/>
+        <result property="customerNo" column="CUSTOMER_NO"/>
+        <result property="name" column="NAME"/>
+        <result property="bankAccount" column="BANK_ACCOUNT"/>
+        <result property="bank" column="BANK"/>
+        <result property="branchBank" column="BRANCH_BANK"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="status" column="STATUS"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID,
+        	CUSTOMER_NO,
+        	NAME,
+        	BANK_ACCOUNT,
+        	BANK,
+        	BRANCH_BANK,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STATUS
+	    ]]>
+	</sql>
+	
+	<sql id="commonAliasColumns">
+	    <![CDATA[
+        	x.ID,
+        	x.CUSTOMER_NO,
+        	x.NAME,
+        	x.BANK_ACCOUNT,
+        	x.BANK,
+        	x.BRANCH_BANK,
+        	x.CREATE_TIME,
+        	x.UPDATE_TIME,
+        	x.STATUS
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="Bank">
+    <![CDATA[
+        INSERT INTO account_bank (
+        	ID,
+        	CUSTOMER_NO,
+        	NAME,
+        	BANK_ACCOUNT,
+        	BANK,
+        	BRANCH_BANK,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STATUS
+        ) VALUES (
+        	#{id},
+        	#{customerNo},
+        	#{name},
+        	#{bankAccount},
+        	#{bank},
+        	#{branchBank},
+        	#{createTime},
+        	#{updateTime},
+        	#{status}
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" parameterType="Bank">
+    <![CDATA[
+        UPDATE account_bank SET
+	        CUSTOMER_NO = #{customerNo},
+	        NAME = #{name},
+	        BANK_ACCOUNT = #{bankAccount},
+	        BANK = #{bank},
+	        BRANCH_BANK = #{branchBank},
+	        CREATE_TIME = #{createTime},
+	        UPDATE_TIME = #{updateTime},
+	        STATUS = #{status}
+        WHERE 
+	        ID = #{id}
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from account_bank
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from account_bank where ID IN 
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}        
+		</foreach> 
+    </delete>
+    
+    <delete id="batchDeleteByLocalId" parameterType="list">
+        delete from account_bank where LOCAL_ID in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}		
+		</foreach> 
+    </delete>
+    
+    <select id="getById" resultMap="bankResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM account_bank 
+	        WHERE 
+		        ID = #{id}
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="bankResult">
+		SELECT <include refid="commonColumns" />
+		FROM account_bank WHERE ID IN 
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}        
+		</foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(customerNo)">
+				AND CUSTOMER_NO = #{customerNo}
+			</if>
+			<if test="@Ognl@isNotEmpty(name)">
+				AND NAME = #{name}
+			</if>
+	       <if test="@Ognl@isNotEmpty(bankAccount)">
+				AND BANK_ACCOUNT = #{bankAccount}
+			</if>
+	       <if test="@Ognl@isNotEmpty(bank)">
+				AND BANK = #{bank}
+			</if>
+	       <if test="@Ognl@isNotEmpty(branchBank)">
+				AND BRANCH_BANK = #{branchBank}
+			</if>
+	       <if test="@Ognl@isNotEmpty(createTimeBegin)">
+				AND CREATE_TIME >= #{createTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(createTimeEnd)">
+				AND CREATE_TIME &lt;= #{createTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(updateTimeBegin)">
+				AND UPDATE_TIME >= #{updateTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(updateTimeEnd)">
+				AND UPDATE_TIME &lt;= #{updateTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(status)">
+				AND STATUS = #{status}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM account_bank 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="bankResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) as id
+    	</if>
+	    FROM account_bank 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	
+</mapper>
+

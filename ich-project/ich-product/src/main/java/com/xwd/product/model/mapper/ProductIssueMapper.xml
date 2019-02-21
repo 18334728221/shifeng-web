@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- 发行表 -->
+<mapper namespace="ProductIssue">
+	
+	<resultMap id="productIssueResult" type="ProductIssue">
+        <result property="id" column="ID"/>
+        <result property="productCode" column="PRODUCT_CODE"/>
+        <result property="circulatingStock" column="CIRCULATING_STOCK"/>
+        <result property="underwritingStartTime" column="UNDERWRITING_START_TIME"/>
+        <result property="underwritingEndTime" column="UNDERWRITING_END_TIME"/>
+        <result property="underwritingTotalAmount" column="UNDERWRITING_TOTAL_AMOUNT"/>
+        <result property="purchaseStartTime" column="PURCHASE_START_TIME"/>
+        <result property="purchaseEndTime" column="PURCHASE_END_TIME"/>
+        <result property="purchaseTotalAmount" column="PURCHASE_TOTAL_AMOUNT"/>
+        <result property="purchaseNum" column="PURCHASE_NUM"/>
+        <result property="isPurchaseEnd" column="IS_PURCHASE_END"/>
+        <result property="circulateTime" column="CIRCULATE_TIME"/>
+        <result property="integralPurchaseNum" column="INTEGRAL_PURCHASE_NUM"/>
+        <result property="integralNum" column="INTEGRAL_NUM"/>
+        <result property="purchasePrice" column="PURCHASE_PRICE"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="status" column="STATUS"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID,
+        	PRODUCT_CODE,
+        	CIRCULATING_STOCK,
+        	UNDERWRITING_START_TIME,
+        	UNDERWRITING_END_TIME,
+        	UNDERWRITING_TOTAL_AMOUNT,
+        	PURCHASE_NUM,
+        	IS_PURCHASE_END,
+        	PURCHASE_START_TIME,
+        	PURCHASE_END_TIME,
+        	PURCHASE_TOTAL_AMOUNT,
+        	CIRCULATE_TIME,
+        	INTEGRAL_PURCHASE_NUM,
+        	INTEGRAL_NUM,
+        	PURCHASE_PRICE,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STATUS
+	    ]]>
+	</sql>
+	
+	<sql id="commonAliasColumns">
+	    <![CDATA[
+        	x.ID,
+        	x.PRODUCT_CODE,
+        	x.CIRCULATING_STOCK,
+        	x.UNDERWRITING_START_TIME,
+        	x.UNDERWRITING_END_TIME,
+        	x.UNDERWRITING_TOTAL_AMOUNT,
+        	x.PURCHASE_NUM,
+        	x.IS_PURCHASE_END,
+        	x.PURCHASE_START_TIME,
+        	x.PURCHASE_END_TIME,
+        	x.PURCHASE_TOTAL_AMOUNT,
+        	x.CIRCULATE_TIME,
+        	x.INTEGRAL_PURCHASE_NUM,
+        	x.INTEGRAL_NUM,
+        	x.PURCHASE_PRICE,
+        	x.CREATE_TIME,
+        	x.UPDATE_TIME,
+        	x.STATUS
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="ProductIssue">
+    <![CDATA[
+        INSERT INTO product_issue (
+        	ID,
+        	PRODUCT_CODE,
+        	CIRCULATING_STOCK,
+        	UNDERWRITING_START_TIME,
+        	UNDERWRITING_END_TIME,
+        	UNDERWRITING_TOTAL_AMOUNT,
+        	PURCHASE_NUM,
+        	IS_PURCHASE_END,
+        	PURCHASE_START_TIME,
+        	PURCHASE_END_TIME,
+        	PURCHASE_TOTAL_AMOUNT,
+        	CIRCULATE_TIME,
+        	INTEGRAL_PURCHASE_NUM,
+        	INTEGRAL_NUM,
+        	PURCHASE_PRICE,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STATUS
+        ) VALUES (
+        	#{id},
+        	#{productCode},
+        	#{circulatingStock},
+        	#{underwritingStartTime},
+        	#{underwritingEndTime},
+        	#{underwritingTotalAmount},
+        	#{purchaseNum},
+        	#{isPurchaseEnd},
+        	#{purchaseStartTime},
+        	#{purchaseEndTime},
+        	#{purchaseTotalAmount},
+        	#{circulateTime},
+        	#{integralPurchaseNum},
+        	#{integralNum},
+        	#{purchasePrice},
+        	#{createTime},
+        	#{updateTime},
+        	#{status}
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" parameterType="ProductIssue">
+    <![CDATA[
+        UPDATE product_issue SET
+	        PRODUCT_CODE = #{productCode},
+	        CIRCULATING_STOCK = #{circulatingStock},
+	        UNDERWRITING_START_TIME = #{underwritingStartTime},
+	        UNDERWRITING_END_TIME = #{underwritingEndTime},
+	        UNDERWRITING_TOTAL_AMOUNT = #{underwritingTotalAmount},
+	        PURCHASE_START_TIME = #{purchaseStartTime},
+	        PURCHASE_END_TIME = #{purchaseEndTime},
+	        PURCHASE_TOTAL_AMOUNT = #{purchaseTotalAmount},
+	        PURCHASE_NUM = #{purchaseNum},
+	        IS_PURCHASE_END = #{isPurchaseEnd},
+	        CIRCULATE_TIME = #{circulateTime},
+	        INTEGRAL_PURCHASE_NUM = #{integralPurchaseNum},
+	        INTEGRAL_NUM = #{integralNum},
+	        PURCHASE_PRICE = #{purchasePrice},
+	        CREATE_TIME = #{createTime},
+	        UPDATE_TIME = #{updateTime},
+	        STATUS = #{status}
+        WHERE 
+	        ID = #{id}
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from product_issue
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from product_issue where ID IN 
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach> 
+    </delete>
+    
+    <delete id="batchDeleteByLocalId" parameterType="list">
+        delete from product_issue where LOCAL_ID in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}		</foreach> 
+    </delete>
+    
+    <select id="getById" resultMap="productIssueResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM product_issue 
+	        WHERE 
+		        ID = #{id}
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="productIssueResult">
+		SELECT <include refid="commonColumns" />
+		FROM product_issue WHERE ID IN 
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(productCode)">
+				AND PRODUCT_CODE = #{productCode}
+			</if>
+	       <if test="@Ognl@isNotEmpty(circulatingStock)">
+				AND CIRCULATING_STOCK = #{circulatingStock}
+			</if>
+	       <if test="@Ognl@isNotEmpty(underwritingStartTimeBegin)">
+				AND UNDERWRITING_START_TIME >= #{underwritingStartTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(underwritingStartTimeEnd)">
+				AND UNDERWRITING_START_TIME &lt;= #{underwritingStartTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(underwritingEndTimeBegin)">
+				AND UNDERWRITING_END_TIME >= #{underwritingEndTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(underwritingEndTimeEnd)">
+				AND UNDERWRITING_END_TIME &lt;= #{underwritingEndTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(underwritingTotalAmount)">
+				AND UNDERWRITING_TOTAL_AMOUNT = #{underwritingTotalAmount}
+			</if>
+	       <if test="@Ognl@isNotEmpty(purchaseStartTimeBegin)">
+				AND PURCHASE_START_TIME >= #{purchaseStartTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(purchaseStartTimeEnd)">
+				AND PURCHASE_START_TIME &lt;= #{purchaseStartTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(purchaseEndTimeBegin)">
+				AND PURCHASE_END_TIME >= #{purchaseEndTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(purchaseEndTimeEnd)">
+				AND PURCHASE_END_TIME &lt;= #{purchaseEndTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(purchaseTotalAmount)">
+				AND PURCHASE_TOTAL_AMOUNT = #{purchaseTotalAmount}
+			</if>
+			<if test="@Ognl@isNotEmpty(purchaseNum)">
+				AND PURCHASE_NUM = #{purchaseNum}
+			</if>
+			<if test="@Ognl@isNotEmpty(isPurchaseEnd)">
+				AND IS_PURCHASE_END = #{isPurchaseEnd} 
+			</if>
+	       <if test="@Ognl@isNotEmpty(circulateTimeBegin)">
+				AND CIRCULATE_TIME >= #{circulateTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(circulateTimeEnd)">
+				AND CIRCULATE_TIME &lt;= #{circulateTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(integralPurchaseNum)">
+				AND INTEGRAL_PURCHASE_NUM = #{integralPurchaseNum}
+			</if>
+	       <if test="@Ognl@isNotEmpty(integralNum)">
+				AND PURCHASE_NUM = #{integralNum}
+			</if>
+	       <if test="@Ognl@isNotEmpty(purchasePrice)">
+				AND PURCHASE_PRICE = #{purchasePrice}
+			</if>
+	       <if test="@Ognl@isNotEmpty(createTimeBegin)">
+				AND CREATE_TIME >= #{createTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(createTimeEnd)">
+				AND CREATE_TIME &lt;= #{createTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(updateTimeBegin)">
+				AND UPDATE_TIME >= #{updateTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(updateTimeEnd)">
+				AND UPDATE_TIME &lt;= #{updateTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(status)">
+				AND STATUS = #{status}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM product_issue 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="productIssueResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) as id
+    	</if>
+	    FROM product_issue 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+ 	
+</mapper>
+

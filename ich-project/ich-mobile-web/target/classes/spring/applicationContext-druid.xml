@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+	<bean id="ichDataSource" parent="parentDataSource">
+		<property name="url" value="${ich.jdbc.url}" />
+		<property name="username" value="${ich.jdbc.username}" />
+		<property name="password" value="${ich.jdbc.password}" />
+	</bean>
+	<bean id="logDataSource" parent="parentDataSource">
+		<property name="url" value="${log.jdbc.url}" />
+		<property name="username" value="${log.jdbc.username}" />
+		<property name="password" value="${log.jdbc.password}" />
+	</bean>
+	
+	<bean id="mallDataSource" parent="parentDataSource">
+        <property name="url" value="${mall.jdbc.url}"/>
+        <property name="username" value="${mall.jdbc.username}" />
+        <property name="password" value="${mall.jdbc.password}" />
+    </bean>
+    <bean id="tradeDataSource" parent="parentDataSource">
+        <property name="url" value="${trade.jdbc.url}"/>
+        <property name="username" value="${trade.jdbc.username}" />
+        <property name="password" value="${trade.jdbc.password}" />
+    </bean>	
+    
+	<bean id="dataSource" class="com.db.dbroute.DynamicDataSource">
+		<property name="targetDataSources">
+			<map key-type="java.lang.String">
+				<entry key="ICH" value-ref="ichDataSource" />
+				<entry key="LOG" value-ref="logDataSource" />
+				<entry key="MALL" value-ref="mallDataSource" />
+				<entry key="TRADE" value-ref="tradeDataSource" />
+			</map>
+		</property>
+		<property name="defaultTargetDataSource" ref="ichDataSource" />
+	</bean>
+
+	<bean id="parentDataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driver.class}" />
+
+		<property name="filters" value="stat" />
+
+		<property name="maxActive" value="20" />
+		<property name="initialSize" value="5" />
+		<property name="maxWait" value="60000" />
+		<property name="minIdle" value="1" />
+
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+
+		<property name="validationQuery" value="SELECT 'x'" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+	</bean>
+
+</beans>

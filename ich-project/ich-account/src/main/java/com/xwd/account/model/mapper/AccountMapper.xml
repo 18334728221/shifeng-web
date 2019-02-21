@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- 顾客账户表 -->
+<mapper namespace="Account">
+	
+	<resultMap id="accountResult" type="Account">
+        <result property="id" column="ID"/>
+        <result property="customerNo" column="CUSTOMER_NO"/>
+        <result property="balance" column="BALANCE"/>
+        <result property="withdrawCash" column="WITHDRAW_CASH"/>
+        <result property="blockedFunds" column="BLOCKED_FUNDS"/>
+        <result property="marketValue" column="MARKET_VALUE"/>
+        <result property="cost" column="COST"/>
+        <result property="profitAndLoss" column="PROFIT_AND_LOSS"/>
+        <result property="historyProfitAndLoss" column="HISTORY_PROFIT_AND_LOSS"/>
+        <result property="buyPoundage" column="BUY_POUNDAGE"/>
+        <result property="sellPoundage" column="SELL_POUNDAGE"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="status" column="STATUS"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID,
+        	CUSTOMER_NO,
+        	BALANCE,
+        	WITHDRAW_CASH,
+        	BLOCKED_FUNDS,
+        	MARKET_VALUE,
+        	COST,
+        	PROFIT_AND_LOSS,
+        	HISTORY_PROFIT_AND_LOSS,
+        	BUY_POUNDAGE,
+        	SELL_POUNDAGE,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STATUS
+	    ]]>
+	</sql>
+	
+	<sql id="commonAliasColumns">
+	    <![CDATA[
+        	x.ID,
+        	x.CUSTOMER_NO,
+        	x.BALANCE,
+        	x.WITHDRAW_CASH,
+        	x.BLOCKED_FUNDS,
+        	x.MARKET_VALUE,
+        	x.COST,
+        	x.PROFIT_AND_LOSS,
+        	x.HISTORY_PROFIT_AND_LOSS,
+        	x.BUY_POUNDAGE,
+        	x.SELL_POUNDAGE,
+        	x.CREATE_TIME,
+        	x.UPDATE_TIME,
+        	x.STATUS
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="Account">
+    <![CDATA[
+        INSERT INTO account (
+        	ID,
+        	CUSTOMER_NO,
+        	BALANCE,
+        	WITHDRAW_CASH,
+        	BLOCKED_FUNDS,
+        	MARKET_VALUE,
+        	COST,
+        	PROFIT_AND_LOSS,
+        	HISTORY_PROFIT_AND_LOSS,
+        	BUY_POUNDAGE,
+        	SELL_POUNDAGE,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STATUS
+        ) VALUES (
+        	#{id},
+        	#{customerNo},
+        	#{balance},
+        	#{withdrawCash},
+        	#{blockedFunds},
+        	#{marketValue},
+        	#{cost},
+        	#{profitAndLoss},
+        	#{historyProfitAndLoss},
+        	#{buyPoundage},
+        	#{sellPoundage},
+        	#{createTime},
+        	#{updateTime},
+        	#{status}
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" parameterType="Account">
+    <![CDATA[
+        UPDATE account SET
+	        CUSTOMER_NO = #{customerNo},
+	        BALANCE = #{balance},
+	        WITHDRAW_CASH = #{withdrawCash},
+	        BLOCKED_FUNDS = #{blockedFunds},
+	        MARKET_VALUE = #{marketValue},
+	        COST = #{cost},
+	        PROFIT_AND_LOSS = #{profitAndLoss},
+	        HISTORY_PROFIT_AND_LOSS = #{historyProfitAndLoss},
+	        BUY_POUNDAGE = #{buyPoundage},
+	        SELL_POUNDAGE = #{sellPoundage},
+	        CREATE_TIME = #{createTime},
+	        UPDATE_TIME = #{updateTime},
+	        STATUS = #{status}
+        WHERE 
+	        ID = #{id}
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from account
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from account where ID IN 
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}        
+		</foreach> 
+    </delete>
+    
+    <delete id="batchDeleteByLocalId" parameterType="list">
+        delete from account where LOCAL_ID in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}		
+		</foreach> 
+    </delete>
+    
+    <select id="getById" resultMap="accountResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM account 
+	        WHERE 
+		        ID = #{id}
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="accountResult">
+		SELECT <include refid="commonColumns" />
+		FROM account WHERE ID IN 
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}        
+		</foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(customerNo)">
+				AND CUSTOMER_NO = #{customerNo}
+			</if>
+	       <if test="@Ognl@isNotEmpty(balance)">
+				AND BALANCE = #{balance}
+			</if>
+	       <if test="@Ognl@isNotEmpty(withdrawCash)">
+				AND WITHDRAW_CASH = #{withdrawCash}
+			</if>
+	       <if test="@Ognl@isNotEmpty(blockedFunds)">
+				AND BLOCKED_FUNDS = #{blockedFunds}
+			</if>
+	       <if test="@Ognl@isNotEmpty(marketValue)">
+				AND MARKET_VALUE = #{marketValue}
+			</if>
+	       <if test="@Ognl@isNotEmpty(cost)">
+				AND COST = #{cost}
+			</if>
+	       <if test="@Ognl@isNotEmpty(profitAndLoss)">
+				AND PROFIT_AND_LOSS = #{profitAndLoss}
+			</if>
+	       <if test="@Ognl@isNotEmpty(buyPoundage)">
+				AND BUY_POUNDAGE = #{buyPoundage}
+			</if>
+	       <if test="@Ognl@isNotEmpty(sellPoundage)">
+				AND SELL_POUNDAGE = #{sellPoundage}
+			</if>
+	       <if test="@Ognl@isNotEmpty(createTimeBegin)">
+				AND CREATE_TIME >= #{createTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(createTimeEnd)">
+				AND CREATE_TIME &lt;= #{createTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(updateTimeBegin)">
+				AND UPDATE_TIME >= #{updateTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(updateTimeEnd)">
+				AND UPDATE_TIME &lt;= #{updateTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(status)">
+				AND STATUS = #{status}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM account 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="accountResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) as id
+    	</if>
+	    FROM account 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+    
+    <update id="updateWithdrawCash">
+    	UPDATE account SET
+        WITHDRAW_CASH = BALANCE
+    </update>
+
+</mapper>
+

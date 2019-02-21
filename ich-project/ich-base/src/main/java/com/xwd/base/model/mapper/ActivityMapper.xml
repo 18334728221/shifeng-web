@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- 活动表 -->
+<mapper namespace="Activity">
+	
+	<resultMap id="activityResult" type="Activity">
+        <result property="id" column="ID"/>
+        <result property="productCode" column="PRODUCT_CODE"/>
+        <result property="imageId" column="IMAGE_ID"/>
+        <result property="imageServerId" column="IMAGE_SERVER_ID"/>
+        <result property="url" column="URL"/>
+        <result property="startTime" column="START_TIME"/>
+        <result property="endTime" column="END_TIME"/>
+        <result property="description" column="DESCRIPTION"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="stauts" column="STAUTS"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID,
+        	PRODUCT_CODE,
+        	IMAGE_ID,
+        	IMAGE_SERVER_ID,
+        	URL,
+        	START_TIME,
+        	END_TIME,
+        	DESCRIPTION,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STAUTS
+	    ]]>
+	</sql>
+	
+	<sql id="commonAliasColumns">
+	    <![CDATA[
+        	x.ID,
+        	x.PRODUCT_CODE,
+        	x.IMAGE_ID,
+        	x.IMAGE_SERVER_ID,
+        	x.URL,
+        	x.START_TIME,
+        	x.END_TIME,
+        	x.DESCRIPTION,
+        	x.CREATE_TIME,
+        	x.UPDATE_TIME,
+        	x.STAUTS
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="Activity">
+    <![CDATA[
+        INSERT INTO base_activity (
+        	ID,
+        	PRODUCT_CODE,
+        	IMAGE_ID,
+        	IMAGE_SERVER_ID,
+        	URL,
+        	START_TIME,
+        	END_TIME,
+        	DESCRIPTION,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STAUTS
+        ) VALUES (
+        	#{id},
+        	#{productCode},
+        	#{imageId},
+        	#{imageServerId},
+        	#{url},
+        	#{startTime},
+        	#{endTime},
+        	#{description},
+        	#{createTime},
+        	#{updateTime},
+        	#{stauts}
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" parameterType="Activity">
+    <![CDATA[
+        UPDATE base_activity SET
+	        PRODUCT_CODE = #{productCode},
+	        IMAGE_ID = #{imageId},
+	        IMAGE_SERVER_ID = #{imageServerId},
+	        URL = #{url},
+	        START_TIME = #{startTime},
+	        END_TIME = #{endTime},
+	        DESCRIPTION = #{description},
+	        CREATE_TIME = #{createTime},
+	        UPDATE_TIME = #{updateTime},
+	        STAUTS = #{stauts}
+        WHERE 
+	        ID = #{id}
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from base_activity
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from base_activity where ID IN 
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach> 
+    </delete>
+    
+    <delete id="batchDeleteByLocalId" parameterType="list">
+        delete from base_activity where LOCAL_ID in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}		</foreach> 
+    </delete>
+    
+    <select id="getById" resultMap="activityResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM base_activity 
+	        WHERE 
+		        ID = #{id}
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="activityResult">
+		SELECT <include refid="commonColumns" />
+		FROM base_activity WHERE ID IN 
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}        
+		</foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(productCode)">
+				AND PRODUCT_CODE = #{productCode}
+			</if>
+	       <if test="@Ognl@isNotEmpty(imageId)">
+				AND IMAGE_ID = #{imageId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(imageServerId)">
+				AND IMAGE_SERVER_ID = #{imageServerId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(url)">
+				AND URL = #{url}
+			</if>
+	       <if test="@Ognl@isNotEmpty(startTime)">
+				AND START_TIME >= #{startTime}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(startTimeEnd)">
+				AND START_TIME &lt;= #{startTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(endTime)">
+				AND END_TIME &lt;= #{endTime}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(endTimeEnd)">
+				AND END_TIME &lt;= #{endTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(description)">
+				AND DESCRIPTION = #{description}
+			</if>
+	       <if test="@Ognl@isNotEmpty(createTimeBegin)">
+				AND CREATE_TIME >= #{createTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(createTimeEnd)">
+				AND CREATE_TIME &lt;= #{createTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(updateTimeBegin)">
+				AND UPDATE_TIME >= #{updateTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(updateTimeEnd)">
+				AND UPDATE_TIME &lt;= #{updateTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(stauts)">
+				AND STAUTS = #{stauts}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM base_activity 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="activityResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) as id
+    	</if>
+	    FROM base_activity 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	<!-- 查看活动列表 -->
+	<select id="findActivity" resultMap="activityResult">
+		SELECT <include refid="commonColumns" />
+		FROM base_activity 
+		<![CDATA[
+		WHERE  START_TIME <= now() AND END_TIME >= now()
+		]]>    
+	</select>
+	
+	  <!-- 最新活动 -->
+    <select id="findIsNew" resultMap="activityResult">
+    	SELECT <include refid="commonColumns" />
+		FROM base_activity 
+		<![CDATA[
+		WHERE  START_TIME <= now() AND END_TIME >= now()
+		]]>  
+		ORDER BY START_TIME DESC
+    </select>
+	
+	
+	 <select id="queryCategoryId" resultType="long">
+   		 SELECT category_id FROM
+   		  product WHERE CODE= (SELECT product_code FROM base_activity WHERE id=#{activId})
+	</select>
+	
+	
+</mapper>
+

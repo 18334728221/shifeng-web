@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="AuthChildrenGroup">
+	
+	<resultMap id="authChildrenGroupResult" type="AuthChildrenGroup">
+		<result property="Id" column="ID"/>
+        <result property="groupId" column="GROUP_ID"/>
+        <result property="childrenGroupId" column="CHILDREN_GROUP_ID"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+	    	ID,
+        	GROUP_ID ,
+        	CHILDREN_GROUP_ID 
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="groupId" parameterType="AuthChildrenGroup">
+    <![CDATA[
+        INSERT INTO auth_children_group (
+        	ID ,
+        	GROUP_ID ,
+        	CHILDREN_GROUP_ID 
+        ) VALUES (
+        	#{id} ,
+        	#{groupId} ,
+        	#{childrenGroupId} 
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" parameterType="AuthChildrenGroup">
+    <![CDATA[
+        UPDATE auth_children_group SET
+       		GROUP_ID = #{groupId} ,
+	        CHILDREN_GROUP_ID = #{childrenGroupId} 
+        WHERE 
+	        ID = #{id} 
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from auth_children_group
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from auth_children_group where id in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach> 
+    </delete>
+    
+    <delete id="deleteByGroupId" parameterType="list">
+        delete from auth_children_group where GROUP_ID = #{groupId}
+    </delete>
+    
+    
+    <select id="getById" resultMap="authChildrenGroupResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM auth_children_group 
+	        WHERE 
+		        ID = #{id}
+	    ]]>
+	</select>
+	
+	<select id="findByGroupId" resultMap="authChildrenGroupResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM auth_children_group 
+	        WHERE 
+		        GROUP_ID = #{groupId}
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="authChildrenGroupResult">
+		SELECT <include refid="commonColumns" />
+		FROM auth_children_group WHERE ID IN
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}        
+		</foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	  
+			<if test="@Ognl@isNotEmpty(groupId)">
+				AND ID = #{Id}
+			</if>    				
+	       <if test="@Ognl@isNotEmpty(groupId)">
+				AND GROUP_ID = #{groupId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(childrenGroupId)">
+				AND CHILDREN_GROUP_ID = #{childrenGroupId}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM auth_children_group 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="authChildrenGroupResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) AS ID
+    	</if>
+	    FROM auth_children_group 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	
+</mapper>
+

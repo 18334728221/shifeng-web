@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd"  default-autowire="byName">
+
+	<context:component-scan base-package="com.rpc">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+	
+    <bean id="initConfig" class="com.rpc.framework.init.InitConfig">
+    	<property name="hostInterfaceList">
+			<list>
+				<bean class="com.rpc.framework.init.HostAndInterface">
+                    <property name="host">
+                    	<map>
+                    		<entry key="127.0.0.1" value="8099"/>
+                    		<!-- 
+                    		<entry key="192.168.1.217" value="8087"/> 
+                    		-->
+                    	</map>
+                    </property>
+                    <property name="interfaces">
+                    	<list>
+                    		<value>com.xwd.engine.service</value>
+                    	</list>
+                    </property>
+                    <!--  
+                    <property name="serializedClass">
+                    	<list>
+                    		<value>com.auth.User</value>
+                    		<value>com.auth.impl.AbstractAuthorizationPrincipal</value>
+                    		<value>com.auth.AuthorizationPrincipal</value>
+                    		<value>com.auth.impl.SimpleGroup</value>
+                    		<value>com.rjsj.edu.auth.model.AuthPermission</value>
+                    		<value>com.rjsj.edu.auth.model.AuthUser</value>
+                    	</list>
+                    </property>
+                    <property name="serializedClassByJava">
+                    	<list>
+                    		<value>com.auth.impl.SimpleAuth</value>
+                    	</list>
+                    </property>
+                    <property name="serialized">
+                    	<value>true</value>
+                    </property>
+                    -->
+                </bean>
+			</list>
+		</property>
+    </bean>
+</beans>
+ 
+ 

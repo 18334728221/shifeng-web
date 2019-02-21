@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.xwd</groupId>
+		<artifactId>ich-project</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<groupId>com.xwd</groupId>
+	<artifactId>ich-deamon-log</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>ich-deamon-log</name>
+	<url>http://maven.apache.org</url>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<alicom-mns-receive-sdk.version>0.0.1</alicom-mns-receive-sdk.version>
+		<aliyun-java-sdk-dybaseapi.version>1.0.0</aliyun-java-sdk-dybaseapi.version>
+		<aliyun-java-sdk-dysmsapi.version>1.0.0</aliyun-java-sdk-dysmsapi.version>
+		<aliyun-sdk-mns.version>1.1.8</aliyun-sdk-mns.version>
+		<aliyun-java-sdk-core.version>3.2.3</aliyun-java-sdk-core.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>com.alicom</groupId>
+			<artifactId>alicom-mns-receive-sdk</artifactId>
+			<version>${alicom-mns-receive-sdk.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alicom</groupId>
+			<artifactId>aliyun-java-sdk-dybaseapi</artifactId>
+			<version>${aliyun-java-sdk-dybaseapi.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alicom</groupId>
+			<artifactId>aliyun-java-sdk-dysmsapi</artifactId>
+			<version>${aliyun-java-sdk-dysmsapi.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alicom</groupId>
+			<artifactId>aliyun-sdk-mns</artifactId>
+			<version>${aliyun-sdk-mns.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.aliyuncs</groupId>
+			<artifactId>aliyun-java-sdk-core</artifactId>
+			<version>${aliyun-java-sdk-core.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.xwd</groupId>
+			<artifactId>ich-model</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.xwd</groupId>
+			<artifactId>ich-base</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.xwd</groupId>
+			<artifactId>ich-auth</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.xwd</groupId>
+			<artifactId>ich-log</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+	</dependencies>
+</project>

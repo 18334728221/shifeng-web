@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- 图片服务器表 -->
+<mapper namespace="ImageServer">
+	
+	<resultMap id="imageServerResult" type="ImageServer">
+        <result property="id" column="ID"/>
+        <result property="imageUrl" column="IMAGE_URL"/>
+        <result property="serverType" column="SERVER_TYPE"/>
+        <result property="status" column="STATUS"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID,
+        	IMAGE_URL,
+        	SERVER_TYPE,
+        	STATUS
+	    ]]>
+	</sql>
+	
+	<sql id="commonAliasColumns">
+	    <![CDATA[
+        	x.ID,
+        	x.IMAGE_URL,
+        	x.SERVER_TYPE,
+        	x.STATUS
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="ImageServer">
+    <![CDATA[
+        INSERT INTO base_image_server (
+        	ID,
+        	IMAGE_URL,
+        	SERVER_TYPE,
+        	STATUS
+        ) VALUES (
+        	#{id},
+        	#{imageUrl},
+        	#{serverType},
+        	#{status}
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" parameterType="ImageServer">
+    <![CDATA[
+        UPDATE base_image_server SET
+	        IMAGE_URL = #{imageUrl},
+	        SERVER_TYPE = #{serverType},
+	        STATUS = #{status}
+        WHERE 
+	        ID = #{id}
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from base_image_server
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from base_image_server where ID IN 
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach> 
+    </delete>
+    
+    <delete id="batchDeleteByLocalId" parameterType="list">
+        delete from base_image_server where LOCAL_ID in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}		</foreach> 
+    </delete>
+    
+    <select id="getById" resultMap="imageServerResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM base_image_server 
+	        WHERE 
+		        ID = #{id}
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="imageServerResult">
+		SELECT <include refid="commonColumns" />
+		FROM base_image_server WHERE ID IN 
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(imageUrl)">
+				AND IMAGE_URL = #{imageUrl}
+			</if>
+	       <if test="@Ognl@isNotEmpty(serverType)">
+				AND SERVER_TYPE = #{serverType}
+			</if>
+	       <if test="@Ognl@isNotEmpty(status)">
+				AND STATUS = #{status}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM base_image_server 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="imageServerResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) as id
+    	</if>
+	    FROM base_image_server 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	
+</mapper>
+

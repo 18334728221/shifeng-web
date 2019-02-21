@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- 点赞表 -->
+<mapper namespace="ThumbsUp">
+	
+	<resultMap id="thumbsUpResult" type="ThumbsUp">
+        <result property="id" column="ID"/>
+        <result property="evaluateId" column="EVALUATE_ID"/>
+        <result property="userId" column="USER_ID"/>
+        <result property="customerNo" column="CUSTOMER_NO"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="status" column="STATUS"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID,
+        	EVALUATE_ID,
+        	USER_ID,
+        	CUSTOMER_NO,
+        	CREATE_TIME,
+        	STATUS
+	    ]]>
+	</sql>
+	
+	<sql id="commonAliasColumns">
+	    <![CDATA[
+        	x.ID,
+        	x.EVALUATE_ID,
+        	x.USER_ID,
+        	x.CUSTOMER_NO,
+        	x.CREATE_TIME,
+        	x.STATUS
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="ThumbsUp">
+    <![CDATA[
+        INSERT INTO evaluate_thumbs_up (
+        	ID,
+        	EVALUATE_ID,
+        	USER_ID,
+        	CUSTOMER_NO,
+        	CREATE_TIME,
+        	STATUS
+        ) VALUES (
+        	#{id},
+        	#{evaluateId},
+        	#{userId},
+        	#{customerNo},
+        	#{createTime},
+        	#{status}
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" parameterType="ThumbsUp">
+    <![CDATA[
+        UPDATE evaluate_thumbs_up SET
+	        EVALUATE_ID = #{evaluateId},
+	        USER_ID = #{userId},
+	        CUSTOMER_NO = #{customerNo},
+	        CREATE_TIME = #{createTime},
+	        STATUS = #{status}
+        WHERE 
+	        ID = #{id}
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from evaluate_thumbs_up
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from evaluate_thumbs_up where ID IN 
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach> 
+    </delete>
+    
+    <delete id="batchDeleteByLocalId" parameterType="list">
+        delete from evaluate_thumbs_up where LOCAL_ID in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}		</foreach> 
+    </delete>
+    
+    <select id="getById" resultMap="thumbsUpResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM evaluate_thumbs_up 
+	        WHERE 
+		        ID = #{id}
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="thumbsUpResult">
+		SELECT <include refid="commonColumns" />
+		FROM evaluate_thumbs_up WHERE ID IN 
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(evaluateId)">
+				AND EVALUATE_ID = #{evaluateId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(userId)">
+				AND USER_ID = #{userId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(customerNo)">
+				AND CUSTOMER_NO = #{customerNo}
+			</if>
+	       <if test="@Ognl@isNotEmpty(createTimeBegin)">
+				AND CREATE_TIME >= #{createTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(createTimeEnd)">
+				AND CREATE_TIME &lt;= #{createTimeEnd}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(createTimeEnd)">
+				AND STATUS = #{status}
+		   </if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM evaluate_thumbs_up WHERE STATUS=1
+		<include refid="dynamicWhere"/>    
+    </select>
+		
+    <select id="queryUserCount" resultType="Long">
+        SELECT count(*) FROM evaluate_thumbs_up 
+		where CUSTOMER_NO = #{customerNo}  AND STATUS=1
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="thumbsUpResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) as id
+    	</if>
+	    FROM evaluate_thumbs_up 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	
+</mapper>
+

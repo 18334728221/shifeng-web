@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- 交易成交记录表 -->
+<mapper namespace="Trade">
+	
+	<resultMap id="tradeResult" type="Trade">
+        <result property="id" column="ID"/>
+        <result property="customerNo" column="CUSTOMER_NO"/>
+        <result property="productName" column="PRODUCT_NAME"/>
+        <result property="productCode" column="PRODUCT_CODE"/>
+        <result property="tradeNo" column="TRADE_NO"/>
+        <result property="tradeMark" column="TRADE_MARK"/>
+        <result property="price" column="PRICE"/>
+        <result property="volume" column="VOLUME"/>
+        <result property="amount" column="AMOUNT"/>
+        <result property="poundage" column="POUNDAGE"/>
+        <result property="entrustCode" column="ENTRUST_CODE"/>
+        <result property="createTime" column="CREATE_TIME"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID,
+        	CUSTOMER_NO,
+        	PRODUCT_NAME,
+        	PRODUCT_CODE,
+        	TRADE_NO,
+        	CREATE_TIME,
+        	TRADE_MARK,
+        	PRICE,
+        	VOLUME,
+        	AMOUNT,
+        	POUNDAGE,
+        	ENTRUST_CODE
+	    ]]>
+	</sql>
+	
+	<sql id="commonAliasColumns">
+	    <![CDATA[
+        	x.ID,
+        	x.CUSTOMER_NO,
+        	x.PRODUCT_NAME,
+        	x.PRODUCT_CODE,
+        	x.TRADE_NO,
+        	x.CREATE_TIME,
+        	x.TRADE_MARK,
+        	x.PRICE,
+        	x.VOLUME,
+        	x.AMOUNT,
+        	x.POUNDAGE,
+        	x.ENTRUST_CODE
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" parameterType="Trade">
+        INSERT INTO trade (
+        	CUSTOMER_NO,
+        	PRODUCT_NAME,
+        	PRODUCT_CODE,
+        	TRADE_NO,
+        	CREATE_TIME,
+        	TRADE_MARK,
+        	PRICE,
+        	VOLUME,
+        	AMOUNT,
+        	POUNDAGE,
+        	ENTRUST_CODE
+        ) VALUES (
+        	#{customerNo},
+        	#{productName},
+        	#{productCode},
+        	#{tradeNo},
+        	#{createTime},
+        	#{tradeMark},
+        	#{price},
+        	#{volume},
+        	#{amount},
+        	#{poundage},
+        	#{entrustCode}
+        )
+		<selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID() AS ID
+        </selectKey>
+	</insert>
+	
+	<insert id="insertBatch" parameterType="list">
+		INSERT INTO trade_order (
+        	CUSTOMER_NO,
+        	PRODUCT_NAME,
+        	PRODUCT_CODE,
+        	TRADE_NO,
+        	CREATE_TIME,
+        	TRADE_MARK,
+        	PRICE,
+        	VOLUME,
+        	AMOUNT,
+        	POUNDAGE,
+        	ENTRUST_CODE
+        ) VALUES
+        <foreach collection ="list" item="o" index= "index" separator =",">
+            (
+	            #{o.customerNo},
+	        	#{o.productName},
+	        	#{o.productCode},
+	        	#{o.tradeNo},
+	        	#{o.createTime},
+	        	#{o.tradeMark},
+	        	#{o.price},
+	        	#{o.volume},
+	        	#{o.amount},
+	        	#{o.poundage},
+	        	#{o.entrustCode}
+            )
+        </foreach >
+	</insert>
+    
+	<update id="update" parameterType="Trade">
+    <![CDATA[
+        UPDATE trade SET
+	        CUSTOMER_NO = #{customerNo},
+	        PRODUCT_NAME = #{productName},
+	        PRODUCT_CODE = #{productCode},
+	        TRADE_NO = #{tradeNo},
+	        CREATE_TIME = #{createTime},
+	        TRADE_MARK = #{tradeMark},
+	        PRICE = #{price},
+	        VOLUME = #{volume},
+	        AMOUNT = #{amount},
+	        POUNDAGE = #{poundage},
+	        ENTRUST_CODE = #{entrustCode}
+        WHERE 
+	        ID = #{id}
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from trade
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from trade where ID IN 
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach> 
+    </delete>
+    
+    <delete id="batchDeleteByLocalId" parameterType="list">
+        delete from trade where LOCAL_ID in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}		</foreach> 
+    </delete>
+    
+    <select id="getById" resultMap="tradeResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM trade 
+	        WHERE 
+		        ID = #{id}
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="tradeResult">
+		SELECT <include refid="commonColumns" />
+		FROM trade WHERE ID IN 
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}       
+		</foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(customerNo)">
+				AND CUSTOMER_NO = #{customerNo}
+			</if>
+	       <if test="@Ognl@isNotEmpty(productName)">
+				AND PRODUCT_NAME = #{productName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(productCode)">
+				AND PRODUCT_CODE = #{productCode}
+			</if>
+	       <if test="@Ognl@isNotEmpty(tradeNo)">
+				AND TRADE_NO = #{tradeNo}
+			</if>
+	       <if test="@Ognl@isNotEmpty(createTimeBegin)">
+				AND CREATE_TIME >= #{createTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(createTimeEnd)">
+				AND CREATE_TIME &lt;= #{createTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(tradeMark)">
+				AND TRADE_MARK = #{tradeMark}
+			</if>
+	       <if test="@Ognl@isNotEmpty(price)">
+				AND PRICE = #{price}
+			</if>
+	       <if test="@Ognl@isNotEmpty(volume)">
+				AND VOLUME = #{volume}
+			</if>
+	       <if test="@Ognl@isNotEmpty(amount)">
+				AND AMOUNT = #{amount}
+			</if>
+	       <if test="@Ognl@isNotEmpty(entrustCode)">
+				AND ENTRUST_CODE = #{entrustCode}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM trade 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="tradeResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) as id
+    	</if>
+	    FROM trade 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+	  
+	<select id="findByMonth" parameterType="map" resultMap="tradeResult">
+    	SELECT sum(PRICE)as PRICE,sum(POUNDAGE)as POUNDAGE,sum(AMOUNT)as AMOUNT FROM trade 
+    	where CUSTOMER_NO=#{customerNo} and 
+    	date_format(create_time,'%Y-%m-%d') between date_sub(curdate(),interval 1 MONTH) and (SELECT DATE_SUB(curdate(), INTERVAL 1 DAY))
+    	AND TRADE_MARK=0
+    </select>
+	  
+	<select id="findSellPoundage" parameterType="map" resultMap="tradeResult">
+    	SELECT sum(PRICE)as PRICE,sum(POUNDAGE)as POUNDAGE,sum(AMOUNT)as AMOUNT FROM trade 
+    	where CUSTOMER_NO=#{customerNo} and 
+    	date_format(create_time,'%Y-%m-%d') between date_sub(curdate(),interval 1 MONTH) and (SELECT DATE_SUB(curdate(), INTERVAL 1 DAY))
+    	AND TRADE_MARK=1
+    </select>
+	
+</mapper>
+

@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- 公司用户表 -->
+<mapper namespace="AuthUser">
+	
+	<resultMap id="authUserResult" type="AuthUser">
+        <result property="id" column="ID"/>
+        <result property="name" column="NAME"/>
+        <result property="password" column="PASSWORD"/>
+        <result property="mobile" column="MOBILE"/>
+        <result property="email" column="EMAIL"/>
+        <result property="userType" column="USER_TYPE"/>
+        <result property="trueName" column="TRUE_NAME"/>
+        <result property="localId" column="LOCAL_ID"/>
+        <result property="imageId" column="IMAGE_ID"/>
+        <result property="imageServerId" column="IMAGE_SERVER_ID"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="status" column="STATUS"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID,
+        	NAME,
+        	PASSWORD,
+        	MOBILE,
+        	EMAIL,
+        	USER_TYPE,
+        	TRUE_NAME,
+        	LOCAL_ID,
+        	IMAGE_ID,
+        	IMAGE_SERVER_ID,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STATUS
+	    ]]>
+	</sql>
+	
+	<sql id="commonAliasColumns">
+	    <![CDATA[
+        	x.ID,
+        	x.NAME,
+        	x.PASSWORD,
+        	x.MOBILE,
+        	x.EMAIL,
+        	x.USER_TYPE,
+        	x.TRUE_NAME,
+        	x.LOCAL_ID,
+        	x.IMAGE_ID,
+        	x.IMAGE_SERVER_ID,
+        	x.CREATE_TIME,
+        	x.UPDATE_TIME,
+        	x.STATUS
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="AuthUser">
+    <![CDATA[
+        INSERT INTO auth_user (
+        	ID,
+        	NAME,
+        	PASSWORD,
+        	MOBILE,
+        	EMAIL,
+        	USER_TYPE,
+        	TRUE_NAME,
+        	LOCAL_ID,
+        	IMAGE_ID,
+        	IMAGE_SERVER_ID,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STATUS
+        ) VALUES (
+        	#{id},
+        	#{name},
+        	#{password},
+        	#{mobile},
+        	#{email},
+        	#{userType},
+        	#{trueName},
+        	#{localId},
+        	#{imageId},
+        	#{imageServerId},
+        	#{createTime},
+        	#{updateTime},
+        	#{status}
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" parameterType="AuthUser">
+    <![CDATA[
+        UPDATE auth_user SET
+	        NAME = #{name},
+	        PASSWORD = #{password},
+	        MOBILE = #{mobile},
+	        EMAIL = #{email},
+	        USER_TYPE = #{userType},
+	        TRUE_NAME = #{trueName},
+	        LOCAL_ID = #{localId},
+	        IMAGE_ID = #{imageId},
+	        IMAGE_SERVER_ID = #{imageServerId},
+	        CREATE_TIME = #{createTime},
+	        UPDATE_TIME = #{updateTime},
+	        STATUS = #{status}
+        WHERE 
+	        ID = #{id}
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from auth_user
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from auth_user where ID IN 
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}       
+ 		</foreach> 
+    </delete>
+    
+    <delete id="batchDeleteByLocalId" parameterType="list">
+        delete from auth_user where LOCAL_ID in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}		
+		</foreach> 
+    </delete>
+    
+    <select id="getById" resultMap="authUserResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM auth_user 
+	        WHERE 
+		        ID = #{id}
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="authUserResult">
+		SELECT <include refid="commonColumns" />
+		FROM auth_user WHERE ID IN 
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}        
+		</foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(name)">
+				AND NAME = #{name}
+			</if>
+	       <if test="@Ognl@isNotEmpty(password)">
+				AND PASSWORD = #{password}
+			</if>
+	       <if test="@Ognl@isNotEmpty(mobile)">
+				AND MOBILE = #{mobile}
+			</if>
+	       <if test="@Ognl@isNotEmpty(email)">
+				AND EMAIL = #{email}
+			</if>
+	       <if test="@Ognl@isNotEmpty(userType)">
+				AND USER_TYPE = #{userType}
+			</if>
+	       <if test="@Ognl@isNotEmpty(trueName)">
+				AND TRUE_NAME = #{trueName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(localId)">
+				AND LOCAL_ID = #{localId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(imageId)">
+				AND IMAGE_ID = #{imageId}
+			</if>
+			<if test="@Ognl@isNotEmpty(imageServerId)">
+				AND IMAGE_SERVER_ID = #{imageServerId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(createTime)">
+				AND CREATE_TIME = #{createTime}
+			</if>
+	       <if test="@Ognl@isNotEmpty(updateTime)">
+				AND UPDATE_TIME = #{updateTime}
+			</if>
+	       <if test="@Ognl@isNotEmpty(status)">
+				AND STATUS = #{status}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM auth_user 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="authUserResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) as id
+    	</if>
+	    FROM auth_user 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+    <select id="getByLocalId" resultMap="authUserResult" parameterType="String">
+	    SELECT <include refid="commonColumns"/>
+	    <![CDATA[
+	        FROM auth_user where LOCAL_ID = #{localId}
+	    ]]>
+    </select>
+    
+    <select id="getUserByLoginNameOrEmailOrMobile" resultMap="authUserResult" parameterType="map">
+    	SELECT <include refid="commonColumns" /> 
+    	FROM auth_user WHERE STATUS=1
+    	<if test="@Ognl@isNotEmpty(id)">
+	   		AND ID != #{id} 
+	    </if>
+    	<if test="@Ognl@isNotEmpty(areaPlatMark)">
+	   		AND AREA_PLAT_MARK = #{areaPlatMark} 
+	    </if>
+	     AND (NAME = #{principal} OR MOBILE = #{principal} OR EMAIL = #{principal})
+    </select>
+    
+    <select id="findExceptByUserIdPageRequest" resultMap="authUserResult">
+    	SELECT 
+    		ID,
+			NAME, 	
+	    	TRUE_NAME
+	    FROM auth_user
+		WHERE
+		ID != #{id}
+		AND ID > 3 
+		AND STATUS = 1
+    </select>
+	
+	<select id="findPasswordByName" resultMap="authUserResult" parameterType="String">
+    	SELECT auth_user.PASSWORD
+	    FROM auth_user 
+		WHERE
+		NAME != #{name}
+    </select>
+    
+    <select id="findAuthUserByName" resultMap="authUserResult" parameterType="AuthUser">
+    	SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM auth_user 
+	        WHERE 
+		      NAME = #{name}
+	    ]]>
+    </select>
+    
+</mapper>
+

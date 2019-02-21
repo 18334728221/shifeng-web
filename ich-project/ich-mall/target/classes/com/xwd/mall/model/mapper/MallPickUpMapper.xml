@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- 发票 -->
+<mapper namespace="MallPickUp">
+	
+	<resultMap id="mallPickUpResult" type="MallPickUp">
+        <result property="id" column="ID"/>
+        <result property="code" column="CODE"/>
+        <result property="sku" column="SKU"/>
+        <result property="addressId" column="ADDRESS_ID"/>
+        <result property="customerNo" column="CUSTOMER_NO"/>
+        <result property="num" column="NUM"/>
+        <result property="pickUpTime" column="PICK_UP_TIME"/>
+        <result property="receiveTime" column="RECEIVE_TIME"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID,
+        	CODE,
+        	SKU,
+        	ADDRESS_ID,
+        	CUSTOMER_NO,
+        	NUM,
+        	PICK_UP_TIME,
+        	RECEIVE_TIME
+	    ]]>
+	</sql>
+	
+	<sql id="commonAliasColumns">
+	    <![CDATA[
+        	x.ID,
+        	x.CODE,
+        	x.SKU,
+        	x.ADDRESS_ID,
+        	x.CUSTOMER_NO,
+        	x.NUM,
+        	x.PICK_UP_TIME,
+        	x.RECEIVE_TIME
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="MallPickUp">
+        INSERT INTO mall_pick_up (
+        	CODE,
+        	SKU,
+        	ADDRESS_ID,
+        	CUSTOMER_NO,
+        	NUM,
+        	PICK_UP_TIME,
+        	RECEIVE_TIME
+        ) VALUES (
+        	#{code},
+        	#{sku},
+        	#{addressId},
+        	#{customerNo},
+        	#{num},
+        	#{pickUpTime},
+        	#{receiveTime}
+        )
+    	<selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID() AS ID
+        </selectKey>
+	</insert>
+    
+	<update id="update" parameterType="MallPickUp">
+    <![CDATA[
+        UPDATE mall_pick_up SET
+	        CODE = #{code},
+        	SKU = #{sku},
+        	ADDRESS_ID = #{addressId},
+        	CUSTOMER_NO = #{customerNo},
+        	NUM = #{num},
+        	PICK_UP_TIME = #{pickUpTime},
+        	RECEIVE_TIME = #{receiveTime}
+        WHERE 
+	        ID = #{id}
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from mall_pick_up
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from mall_pick_up where ID IN 
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach> 
+    </delete>
+    
+    <delete id="batchDeleteByLocalId" parameterType="list">
+        delete from mall_pick_up where LOCAL_ID in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}		</foreach> 
+    </delete>
+    
+    <select id="getById" resultMap="mallPickUpResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM mall_pick_up 
+	        WHERE 
+		        ID = #{id}
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="mallPickUpResult">
+		SELECT <include refid="commonColumns" />
+		FROM mall_pick_up WHERE ID IN 
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(code)">
+				 AND CODE = #{code}
+			</if>
+	       <if test="@Ognl@isNotEmpty(sku)">
+				AND SKU = #{sku}
+			</if>
+			 <if test="@Ognl@isNotEmpty(addressId)">
+				AND ADDRESS_ID = #{addressId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(customerNo)">
+				AND CUSTOMER_NO = #{customerNo}
+			</if>
+	       <if test="@Ognl@isNotEmpty(num)">
+				AND NUM = #{num}
+			</if>
+	       <if test="@Ognl@isNotEmpty(pickUpTime)">
+				AND PICK_UP_TIME = #{pickUpTime}
+			</if>
+	       <if test="@Ognl@isNotEmpty(receiveTime)">
+				AND RECEIVE_TIME = #{receiveTime}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM mall_pick_up 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="mallPickUpResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) as id
+    	</if>
+	    FROM mall_pick_up 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	
+</mapper>
+

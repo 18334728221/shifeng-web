@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="AuthPermission">
+	
+	<resultMap id="authPermissionResult" type="AuthPermission">
+        <result property="id" column="ID"/>
+        <result property="moduleId" column="MODULE_ID"/>
+        <result property="target" column="TARGET"/>
+        <result property="operation" column="OPERATION"/>
+        <result property="permissionType" column="PERMISSION_TYPE"/>
+        <result property="description" column="DESCRIPTION"/>
+        <result property="moduleName" column="MODULE_NAME"/>
+        <result property="controlLevel" column="CONTROL_LEVEL"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID ,
+        	MODULE_ID,
+        	TARGET ,
+        	OPERATION ,
+        	PERMISSION_TYPE ,
+        	DESCRIPTION ,
+        	CONTROL_LEVEL
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="AuthPermission">
+    <![CDATA[
+        INSERT INTO auth_permission (
+        	ID ,
+        	MODULE_ID,
+        	TARGET ,
+        	OPERATION ,
+        	PERMISSION_TYPE ,
+        	DESCRIPTION ,
+        	CONTROL_LEVEL
+        ) VALUES (
+        	#{id} ,
+        	#{moduleId},
+        	#{target} ,
+        	#{operation} ,
+        	#{permissionType} ,
+        	#{description} ,
+        	#{controlLevel}
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" parameterType="AuthPermission">
+    <![CDATA[
+        UPDATE auth_permission SET
+        	MODULE_ID = #{moduleId},
+	        TARGET = #{target} ,
+	        OPERATION = #{operation} ,
+	        PERMISSION_TYPE = #{permissionType} ,
+	        DESCRIPTION = #{description} ,
+	        CONTROL_LEVEL = #{controlLevel}
+        WHERE 
+	        ID = #{id} 
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from auth_permission
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from auth_permission where id in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}        
+		</foreach> 
+    </delete>
+    
+    
+    <select id="getById" resultMap="authPermissionResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM auth_permission 
+	        WHERE 
+		        ID = #{id} 
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="authPermissionResult">
+		SELECT <include refid="commonColumns" />
+		FROM auth_permission WHERE ID IN
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}        
+		</foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+			<if test="@Ognl@isNotEmpty(moduleId)">
+				AND MODULE_ID = #{moduleId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(target)">
+				AND TARGET = #{target}
+			</if>
+	       <if test="@Ognl@isNotEmpty(operation)">
+				AND OPERATION = #{operation}
+			</if>
+	       <if test="@Ognl@isNotEmpty(permissionType)">
+				AND PERMISSION_TYPE = #{permissionType}
+			</if>
+	       <if test="@Ognl@isNotEmpty(description)">
+				AND DESCRIPTION = #{description}
+			</if>
+			<if test="@Ognl@isNotEmpty(controlLevel)">
+				AND CONTROL_LEVEL = #{controlLevel}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM auth_permission 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="authPermissionResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />,
+    	(select MODULE_NAME from auth_module b1 where b1.ID = b.MODULE_ID) MODULE_NAME
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) AS ID 
+    	</if>
+    	FROM auth_permission b
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+    <select id="findPermissionsByUser"  resultMap="authPermissionResult">     
+		SELECT
+		<include refid="commonColumns" />
+        FROM  
+           auth_permission X
+        WHERE X.ID IN (SELECT Y.PERMISSION_ID FROM auth_user_permission Y WHERE Y.USER_ID=#{userId})
+	</select>
+	
+	<select id="findPermissionsByGroup"  resultMap="authPermissionResult">     
+		SELECT
+		<include refid="commonColumns" />
+        FROM  
+           auth_permission X
+        WHERE X.ID IN (SELECT Y.PERMISSION_ID FROM auth_group_permission Y WHERE Y.GROUP_ID=#{groupId})
+	</select>
+	
+	<select id="findPermissionsByUserAndType" resultMap="authPermissionResult" parameterType="map">     
+		SELECT
+		<include refid="commonColumns" />
+        FROM  
+           auth_permission X
+        WHERE X.ID IN (SELECT Y.PERMISSION_ID FROM auth_group_permission Y WHERE Y.USER_ID=#{userId} AND X.PERMISSION_TYPE=#{permissionType})
+	</select>
+	
+	<select id="findPermissionsByRoles"  resultMap="authPermissionResult">     
+		SELECT
+		<include refid="commonColumns" />
+        FROM  
+           auth_permission X
+        WHERE X.ID IN (SELECT Y.PERMISSION_ID FROM auth_role_permission Y WHERE Y.ROLE_ID IN(SELECT Z.ID FROM auth_role Z WHERE Z.ROLE_NAME IN 
+        <foreach collection="list" item="roles"  open="(" separator="," close=")">   
+			#{roles}        
+		</foreach> 
+        ))
+	</select>
+	
+</mapper>
+

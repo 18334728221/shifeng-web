@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- 产品库存表 -->
+<mapper namespace="Sku">
+	
+	<resultMap id="skuResult" type="Sku">
+        <result property="id" column="ID"/>
+        <result property="productCode" column="PRODUCT_CODE"/>
+        <result property="sku" column="SKU"/>
+        <result property="av" column="AV"/>
+        <result property="totalStock" column="TOTAL_STOCK"/>
+        <result property="stock" column="STOCK"/>
+        <result property="putaway" column="PUTAWAY"/>
+        <result property="imageId" column="IMAGE_ID"/>
+        <result property="imageServerId" column="IMAGE_SERVER_ID"/>
+        <result property="description" column="DESCRIPTION"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="status" column="STATUS"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID,
+        	PRODUCT_CODE,
+        	SKU,
+        	AV,
+        	TOTAL_STOCK,
+        	STOCK,
+        	PUTAWAY,
+        	IMAGE_ID,
+        	IMAGE_SERVER_ID,
+        	DESCRIPTION,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STATUS
+	    ]]>
+	</sql>
+	
+	<sql id="commonAliasColumns">
+	    <![CDATA[
+        	x.ID,
+        	x.PRODUCT_CODE,
+        	x.SKU,
+        	x.AV,
+        	x.TOTAL_STOCK,
+        	x.STOCK,
+        	x.PUTAWAY,
+        	x.IMAGE_ID,
+        	x.IMAGE_SERVER_ID,
+        	x.DESCRIPTION,
+        	x.CREATE_TIME,
+        	x.UPDATE_TIME,
+        	x.STATUS
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="Sku">
+    <![CDATA[
+        INSERT INTO product_sku (
+        	ID,
+        	PRODUCT_CODE,
+        	SKU,
+        	AV,
+        	TOTAL_STOCK,
+        	STOCK,
+        	PUTAWAY,
+        	IMAGE_ID,
+        	IMAGE_SERVER_ID,
+        	DESCRIPTION,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STATUS
+        ) VALUES (
+        	#{id},
+        	#{productCode},
+        	#{sku},
+        	#{av},
+        	#{totalStock},
+        	#{stock},
+        	#{putaway},
+        	#{imageId},
+        	#{imageServerId},
+        	#{description},
+        	#{createTime},
+        	#{updateTime},
+        	#{status}
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" parameterType="Sku">
+    <![CDATA[
+        UPDATE product_sku SET
+	        PRODUCT_CODE = #{productCode},
+	        SKU = #{sku},
+	        AV = #{av},
+	        STOCK = #{stock},
+	        TOTAL_STOCK = #{totalStock},
+	        PUTAWAY = #{putaway},
+	        IMAGE_ID = #{imageId},
+	        IMAGE_SERVER_ID = #{imageServerId},
+	        DESCRIPTION = #{description},
+	        CREATE_TIME = #{createTime},
+	        UPDATE_TIME = #{updateTime},
+	        STATUS = #{status}
+        WHERE 
+	        ID = #{id}
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from product_sku
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from product_sku where ID IN 
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach> 
+    </delete>
+    
+    <delete id="batchDeleteByLocalId" parameterType="list">
+        delete from product_sku where LOCAL_ID in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}		</foreach> 
+    </delete>
+    
+    <select id="getById" resultMap="skuResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM product_sku 
+	        WHERE 
+		        ID = #{id}
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="skuResult">
+		SELECT <include refid="commonColumns" />
+		FROM product_sku WHERE ID IN 
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(productCode)">
+				AND PRODUCT_CODE = #{productCode}
+			</if>
+	       <if test="@Ognl@isNotEmpty(sku)">
+				AND SKU = #{sku}
+			</if>
+			<if test="@Ognl@isNotEmpty(av)">
+				AND AV = #{av}
+			</if>
+			<if test="@Ognl@isNotEmpty(totalStock)">
+				AND TOTAL_STOCK = #{totalStock}
+			</if>
+	       <if test="@Ognl@isNotEmpty(stock)">
+				AND STOCK = #{stock}
+			</if>
+	       <if test="@Ognl@isNotEmpty(putaway)">
+				AND PUTAWAY = #{putaway}
+			</if>
+	       <if test="@Ognl@isNotEmpty(imageId)">
+				AND IMAGE_ID = #{imageId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(imageServerId)">
+				AND IMAGE_SERVER_ID = #{imageServerId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(description)">
+				AND DESCRIPTION = #{description}
+			</if>
+	       <if test="@Ognl@isNotEmpty(createTimeBegin)">
+				AND CREATE_TIME >= #{createTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(createTimeEnd)">
+				AND CREATE_TIME &lt;= #{createTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(updateTimeBegin)">
+				AND UPDATE_TIME >= #{updateTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(updateTimeEnd)">
+				AND UPDATE_TIME &lt;= #{updateTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(status)">
+				AND STATUS = #{status}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM product_sku 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="skuResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) as id
+    	</if>
+	    FROM product_sku 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+    
+    
+     <!--  根据productCode查询最后一条 -->
+    <select id="findLastSkuByProduct" resultMap="skuResult" parameterType="map">
+    	SELECT <include refid="commonColumns" />
+    	<![CDATA[
+		    FROM product_sku 
+	        WHERE 
+		        PRODUCT_CODE = #{productCode} ORDER BY ID DESC LIMIT 1 
+	    ]]>
+    </select>
+	
+</mapper>
+

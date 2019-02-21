@@ -1,0 +1,28 @@
+
+    	/*公共样式*/
+    	html{
+    		font-size: 15px;
+    		font-family: "微软雅黑";
+    	}
+    	*{
+    		margin:0;
+    		padding:0;
+    	}
+    	a{
+			text-decoration: none;
+		}
+		a:visited{
+			color:inherit;
+		}
+		ul{
+			margin: 0;
+			padding: 0;
+			list-style: none;
+		}
+    	.fl{
+            float: left;
+        }
+        .fr{
+            float: right;
+        }
+        

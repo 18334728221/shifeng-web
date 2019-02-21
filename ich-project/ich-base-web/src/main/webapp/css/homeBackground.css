@@ -1,0 +1,119 @@
+html,body{
+	width: 100%;
+	height: 100%;
+	overflow-y: hidden;
+}
+header{
+	/*width: 70%;*/
+	width: 1120px;
+	/*height:130px;*/
+	height: 20%;
+	line-height: 130px;
+	margin: 0 auto;
+	/*border:1px solid #000;*/
+}
+#tel{
+	color: #c10000;
+	font-size: 12px;
+}
+.bg{
+	width: 100%;
+	/*height: 340px;*/
+	height: 50%;
+	background: url(../images/home/homeBack_bg.png) no-repeat;
+	background-size: cover;
+	position: relative;
+	text-align: center;
+}
+.loginBox{
+	width: 720px;
+	height: 320px;
+	background: #ffffff;
+	position: absolute;
+	left:50%;
+	margin-top: 60px;
+	margin-left: -360px;
+	box-shadow:0px 15px 10px -15px #000;
+
+}
+.loginBoxleft{
+	width: 430px;
+	height: 270px;
+	background: url(../images/home/loginPic.png) no-repeat;
+	background-size: 100% auto;
+	/*background: red;*/
+}
+.loginBoxRight{
+	width: 240px;
+	height: 270px;
+	border:1px solid #dcdcdc;
+	margin-top: 3%;
+	border-radius: 1px;
+}
+.login_title{
+	width: 200px;
+	height: 30px;
+	line-height: 30px;
+	border-bottom: 1px solid #ccc;
+	margin:10px auto;
+	text-align: center;
+}
+.box{
+	width: 200px;
+	height: 30px;
+	border:1px solid #dcdcdc;
+	margin: 20px auto;
+}
+.box1{
+	width: 36px;
+	height: 30px;
+	text-align: center;
+	/*background: red;*/
+	border-right: 1px solid #dcdcdc;
+}
+.box1 img{
+	margin-top: 4px;
+}
+input{
+	border:0;
+}
+input:focus{
+	outline:none;
+}
+.text1{
+	width: 160px;
+	height: 28px;
+	margin-left: 1px;
+}
+.choose{
+	width: 200px;
+	height: 20px;
+	margin: 0px auto;
+	/*background: pink;*/
+}
+.choose1{
+	float: right;
+}
+.landBtn{
+	width: 200px;
+	height: 30px;
+	background: #c10000;
+	text-align: center;
+	line-height: 30px;
+	margin: 40px auto;
+	color: #fff;
+}
+footer{
+	/*width: 70%;*/
+	width: 1120px;
+	height: 60px;
+	line-height: 60px;
+	border-top:1px solid #dcdcdc;
+	margin: 110px auto;
+	/*background: pink;*/
+	text-align: center;
+}
+footer img{
+	width:40px;
+	height: 40px;
+}

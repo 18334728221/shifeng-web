@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- 产品种类表 -->
+<mapper namespace="Category">
+	
+	<resultMap id="categoryResult" type="Category">
+        <result property="id" column="ID"/>
+        <result property="name" column="NAME"/>
+        <result property="description" column="DESCRIPTION"/>
+        <result property="seq" column="SEQ"/>
+        <result property="imageId" column="IMAGE_ID"/>
+        <result property="imageServerId" column="IMAGE_SERVER_ID"/>
+        <result property="parentId" column="PARENT_ID"/>
+        <result property="isTop" column="IS_TOP"/>
+        <result property="mainImage" column="MAIN_IMAGE"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID,
+        	NAME,
+        	DESCRIPTION,
+        	SEQ,
+        	IMAGE_ID,
+        	IMAGE_SERVER_ID,
+        	PARENT_ID,
+        	IS_TOP,
+        	MAIN_IMAGE
+	    ]]>
+	</sql>
+	
+	<sql id="commonAliasColumns">
+	    <![CDATA[
+        	x.ID,
+        	x.NAME,
+        	x.DESCRIPTION,
+        	x.SEQ,
+        	x.IMAGE_ID,
+        	x.IMAGE_SERVER_ID,
+        	x.PARENT_ID,
+        	x.IS_TOP,
+        	x.MAIN_IMAGE
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="Category">
+    <![CDATA[
+        INSERT INTO base_category (
+        	ID,
+        	NAME,
+        	DESCRIPTION,
+        	SEQ,
+        	IMAGE_ID,
+        	IMAGE_SERVER_ID,
+        	PARENT_ID,
+        	IS_TOP,
+        	MAIN_IMAGE
+        ) VALUES (
+        	#{id},
+        	#{name},
+        	#{description},
+        	#{seq},
+        	#{imageId},
+        	#{imageServerId},
+        	#{parentId},
+        	#{isTop},
+        	#{mainImage}
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" parameterType="Category">
+    <![CDATA[
+    	UPDATE base_category SET
+        	NAME = #{name},
+	        DESCRIPTION = #{description},
+	        SEQ = #{seq},
+	        IMAGE_ID = #{imageId},
+	        IMAGE_SERVER_ID = #{imageServerId},
+	        PARENT_ID = #{parentId},
+	        IS_TOP = #{isTop},
+	        MAIN_IMAGE = #{mainImage}
+        WHERE 
+	        ID = #{id}
+    ]]>
+	</update>
+	
+	<update id="updateIsTop" parameterType="Category">
+    <![CDATA[
+    	UPDATE base_category SET
+	        IS_TOP=#{isTop}
+        WHERE 
+	        ID = #{id}
+    ]]>
+	</update>
+	
+	<update id="updateDown" parameterType="Category">
+    <![CDATA[
+    	UPDATE base_category SET
+	        IS_TOP= 0
+        WHERE 
+	        ID not in (#{id})
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from base_category
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from base_category where ID IN 
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach> 
+    </delete>
+    
+    <delete id="batchDeleteByLocalId" parameterType="list">
+        delete from base_category where LOCAL_ID in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}		</foreach> 
+    </delete>
+    
+    <select id="getById" resultMap="categoryResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM base_category 
+	        WHERE 
+		        ID = #{id}
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="categoryResult">
+		SELECT <include refid="commonColumns" />
+		FROM base_category WHERE ID IN 
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(name)">
+				AND NAME = #{name}
+			</if>
+	       <if test="@Ognl@isNotEmpty(description)">
+				AND DESCRIPTION = #{description}
+			</if>
+	       <if test="@Ognl@isNotEmpty(seq)">
+				AND SEQ = #{seq}
+			</if>
+	       <if test="@Ognl@isNotEmpty(imageId)">
+				AND IMAGE_ID = #{imageId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(imageServerId)">
+				AND IMAGE_SERVER_ID = #{imageServerId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(parentId)">
+				AND PARENT_ID = #{parentId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(isTop)">
+				AND IS_TOP = #{isTop}
+			</if>
+			<if test="@Ognl@isNotEmpty(mainImage)">
+				AND MAIN_IMAGE = #{mainImage}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM base_category 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="categoryResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) as id
+    	</if>
+	    FROM base_category 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	
+</mapper>
+

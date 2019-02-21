@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.xwd</groupId>
+		<artifactId>ich-project</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<groupId>com.xwd</groupId>
+	<artifactId>ich-base-web</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
+	<name>ich-base-web Maven Webapp</name>
+	<url>http://maven.apache.org</url>
+	<dependencies>
+		<dependency>
+			<groupId>com.xwd</groupId>
+			<artifactId>ich-base</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.xwd</groupId>
+			<artifactId>ich-auth</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.xwd</groupId>
+			<artifactId>ich-queue</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<finalName>ich-base-web</finalName>
+		<plugins>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<archiveClasses>true</archiveClasses>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<executions>  
+                	<execution>  
+	                    <id>interface</id>  
+	                    <phase>package</phase>  
+	                    <goals>  
+	                        <goal>jar</goal>  
+	                    </goals>  
+	                    <configuration>  
+	                        <!-- 添加classifier修饰以区别于war，保证上传成功 -->  
+	                        <classifier>interface</classifier>  
+	                        <includes>  
+	                            <include>**/com/wxd/auth/action</include>  
+	                            <include>**/com/wxd/auth/realm</include> 
+	                            <include>**/com/wxd/base/web</include>  
+	                            <include>**/com/wxd/home/action</include>  
+	                            <include>**/com/wxd/web/init</include>  
+	                        </includes>  
+	                    </configuration>  
+                	</execution>  
+           		</executions>  
+			</plugin>
+		</plugins>
+	</build>
+</project>

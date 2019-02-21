@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="AuthRole">
+	
+	<resultMap id="authRoleResult" type="AuthRole">
+        <result property="id" column="ID"/>
+        <result property="roleName" column="ROLE_NAME"/>
+        <result property="isInnerRole" column="IS_INNER_ROLE"/>
+        <result property="description" column="DESCRIPTION"/>
+        <result property="isUserType" column="IS_USER_TYPE"/>
+        <result property="isFrontAccesse" column="IS_FRONT_ACCESSE"/>
+        <result property="isBackgroundAccesse" column="IS_BACKGROUND_ACCESSE"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID ,
+        	ROLE_NAME ,
+        	IS_INNER_ROLE ,
+        	DESCRIPTION ,
+        	IS_USER_TYPE ,
+        	IS_FRONT_ACCESSE ,
+        	IS_BACKGROUND_ACCESSE
+	    ]]>
+	</sql>
+	
+	<sql id="commonAliasColumns">
+	    <![CDATA[
+        	x.ID ,
+        	x.ROLE_NAME ,
+        	x.IS_INNER_ROLE ,
+        	x.DESCRIPTION ,
+        	x.IS_USER_TYPE ,
+        	x.IS_FRONT_ACCESSE ,
+        	x.IS_BACKGROUND_ACCESSE
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="AuthRole">
+    <![CDATA[
+        INSERT INTO auth_role (
+        	ID ,
+        	ROLE_NAME ,
+        	IS_INNER_ROLE ,
+        	DESCRIPTION ,
+        	IS_USER_TYPE ,
+        	IS_FRONT_ACCESSE ,
+        	IS_BACKGROUND_ACCESSE
+        ) VALUES (
+        	#{id} ,
+        	#{roleName} ,
+        	#{isInnerRole} ,
+        	#{description} ,
+        	#{isUserType} ,
+        	#{isFrontAccesse} ,
+        	#{isBackgroundAccesse} 
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" parameterType="AuthRole">
+    <![CDATA[
+        UPDATE auth_role SET
+	        ROLE_NAME = #{roleName} ,
+	        IS_INNER_ROLE = #{isInnerRole} ,
+	        DESCRIPTION = #{description} ,
+	        IS_USER_TYPE = #{isUserType} ,
+        	IS_FRONT_ACCESSE = #{isFrontAccesse} ,
+        	IS_BACKGROUND_ACCESSE = #{isBackgroundAccesse}
+        WHERE 
+	        ID = #{id} 
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from auth_role
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from auth_role where id in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}        
+        </foreach> 
+    </delete>
+    
+    
+    <select id="getById" resultMap="authRoleResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM auth_role 
+	        WHERE 
+		        ID = #{id} 
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="authRoleResult">
+		SELECT <include refid="commonColumns" />
+		FROM auth_role WHERE id in
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}        
+		</foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(roleName)">
+				AND ROLE_NAME LIKE concat('%', #{roleName}, '%')
+			</if>
+	       <if test="@Ognl@isNotEmpty(description)">
+				AND DESCRIPTION = #{description}
+			</if>
+			<if test="@Ognl@isNotEmpty(isInnerRole)">
+				AND IS_INNER_ROLE = #{isInnerRole}
+			</if>
+			<if test="@Ognl@isNotEmpty(isUserType)">
+				AND IS_USER_TYPE = #{isUserType}
+			</if>
+			<if test="@Ognl@isNotEmpty(isFrontAccesse)">
+				AND IS_FRONT_ACCESSE = #{isFrontAccesse}
+			</if>
+			<if test="@Ognl@isNotEmpty(isBackgroundAccesse)">
+				AND IS_BACKGROUND_ACCESSE = #{isBackgroundAccesse}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM auth_role 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+	
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="authRoleResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) AS ID 
+    	</if>
+	    FROM auth_role 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+    <select id="findRolesByUser"  resultMap="authRoleResult">     
+		SELECT <include refid="commonAliasColumns" />
+        FROM auth_role x
+        WHERE x.ID IN (SELECT Y.ROLE_ID FROM auth_user_role Y WHERE Y.USER_ID=#{userId})
+	</select>
+	
+	<select id="findRolesByGroup"  resultMap="authRoleResult">     
+		SELECT <include refid="commonAliasColumns" />
+        FROM  auth_role x
+        WHERE x.ID IN (SELECT Y.ROLE_ID FROM auth_group_role Y WHERE Y.GROUP_ID=#{groupId})
+	</select>
+	
+</mapper>
+

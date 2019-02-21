@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- 手艺人 -->
+<mapper namespace="Craftsman">
+	
+	<resultMap id="craftsmanResult" type="Craftsman">
+        <result property="id" column="ID"/>
+        <result property="name" column="NAME"/>
+        <result property="password" column="PASSWORD"/>
+        <result property="craftsmanNo" column="CRAFTSMAN_NO"/>
+        <result property="shopName" column="SHOP_NAME"/>
+        <result property="sex" column="SEX"/>
+        <result property="areaPlatMark" column="AREA_PLAT_MARK"/>
+        <result property="address" column="ADDRESS"/>
+        <result property="mobile" column="MOBILE"/>
+        <result property="identityCardNo" column="IDENTITY_CARD_NO"/>
+        <result property="cardPositiveImageId" column="CARD_POSITIVE_IMAGE_ID"/>
+        <result property="cardOppositeImageId" column="CARD_OPPOSITE_IMAGE_ID"/>
+        <result property="bgImageId" column="BG_IMAGE_ID"/>
+         <result property="headImageId" column="HEAD_IMAGE_ID"/>
+         <result property="imageServerId" column="IMAGE_SERVER_ID"/>
+        <result property="email" column="EMAIL"/>
+        <result property="wxId" column="WX_ID"/>
+        <result property="weixin" column="WEIXIN"/>
+        <result property="qq" column="QQ"/>
+        <result property="localId" column="LOCAL_ID"/>
+        <result property="description" column="DESCRIPTION"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="status" column="STATUS"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID,
+        	NAME,
+        	PASSWORD,
+        	CRAFTSMAN_NO,
+        	SHOP_NAME,
+        	SEX,
+        	AREA_PLAT_MARK,
+        	ADDRESS,
+        	MOBILE,
+        	IDENTITY_CARD_NO,
+        	CARD_POSITIVE_IMAGE_ID,
+        	CARD_OPPOSITE_IMAGE_ID,
+        	BG_IMAGE_ID,
+        	HEAD_IMAGE_ID,
+        	IMAGE_SERVER_ID,
+        	EMAIL,
+        	WX_ID,
+        	WEIXIN,
+        	QQ,
+        	LOCAL_ID,
+        	DESCRIPTION,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STATUS
+	    ]]>
+	</sql>
+	
+	<sql id="commonAliasColumns">
+	    <![CDATA[
+        	x.ID,
+        	x.NAME,
+        	x.PASSWORD,
+        	x.CRAFTSMAN_NO,
+        	x.SHOP_NAME,
+        	x.SEX,
+        	x.AREA_PLAT_MARK,
+        	x.ADDRESS,
+        	x.MOBILE,
+        	x.IDENTITY_CARD_NO,
+        	x.CARD_POSITIVE_IMAGE_ID,
+        	x.CARD_OPPOSITE_IMAGE_ID,
+        	x.BG_IMAGE_ID,
+        	x.HEAD_IMAGE_ID,
+        	x.IMAGE_SERVER_ID,
+        	x.EMAIL,
+        	x.WX_ID,
+        	x.WEIXIN,
+        	x.QQ,
+        	x.LOCAL_ID,
+        	x.DESCRIPTION,
+        	x.CREATE_TIME,
+        	x.UPDATE_TIME,
+        	x.STATUS
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="Craftsman">
+    <![CDATA[
+        INSERT INTO craftsman (
+        	ID,
+        	NAME,
+        	PASSWORD,
+        	CRAFTSMAN_NO,
+        	SHOP_NAME,
+        	SEX,
+        	AREA_PLAT_MARK,
+        	ADDRESS,
+        	MOBILE,
+        	IDENTITY_CARD_NO,
+        	CARD_POSITIVE_IMAGE_ID,
+        	CARD_OPPOSITE_IMAGE_ID,
+        	BG_IMAGE_ID,
+        	HEAD_IMAGE_ID,
+        	IMAGE_SERVER_ID,
+        	EMAIL,
+        	WX_ID,
+        	WEIXIN,
+        	QQ,
+        	LOCAL_ID,
+        	DESCRIPTION,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STATUS
+        ) VALUES (
+        	#{id},
+        	#{name},
+        	#{password},
+        	#{craftsmanNo},
+        	#{shopName},
+        	#{sex},
+        	#{areaPlatMark},
+        	#{address},
+        	#{mobile},
+        	#{identityCardNo},
+        	#{cardPositiveImageId},
+        	#{cardOppositeImageId},
+        	#{bgImageId},
+        	#{headImageId},
+        	#{imageServerId},
+        	#{email},
+        	#{wxId},
+        	#{weixin},
+        	#{qq},
+        	#{localId},
+        	#{description},
+        	#{createTime},
+        	#{updateTime},
+        	#{status}
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" parameterType="Craftsman">
+    <![CDATA[
+        UPDATE craftsman SET
+	        NAME = #{name},
+	        PASSWORD = #{password},
+	        CRAFTSMAN_NO = #{craftsmanNo},
+	        SHOP_NAME = #{shopName},
+	        SEX = #{sex},
+	        AREA_PLAT_MARK = #{areaPlatMark},
+	        ADDRESS = #{address},
+	        MOBILE = #{mobile},
+	        IDENTITY_CARD_NO = #{identityCardNo},
+	        CARD_POSITIVE_IMAGE_ID = #{cardPositiveImageId},
+	        CARD_OPPOSITE_IMAGE_ID = #{cardOppositeImageId},
+	        BG_IMAGE_ID = #{bgImageId},
+	        HEAD_IMAGE_ID = #{headImageId},
+	        IMAGE_SERVER_ID = #{imageServerId},
+	        EMAIL = #{email},
+	        WX_ID = #{wxId},
+	        WEIXIN = #{weixin},
+	        QQ = #{qq},
+	        LOCAL_ID = #{localId},
+	        DESCRIPTION = #{description},
+	        CREATE_TIME = #{createTime},
+	        UPDATE_TIME = #{updateTime},
+	        STATUS = #{status}
+        WHERE 
+	        ID = #{id}
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from craftsman
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from craftsman where ID IN 
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach> 
+    </delete>
+    
+    <delete id="batchDeleteByLocalId" parameterType="list">
+        delete from craftsman where LOCAL_ID in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}		</foreach> 
+    </delete>
+    
+    <select id="getById" resultMap="craftsmanResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM craftsman 
+	        WHERE 
+		        ID = #{id}
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="craftsmanResult">
+		SELECT <include refid="commonColumns" />
+		FROM craftsman WHERE ID IN 
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(name)">
+				AND NAME = #{name}
+			</if>
+	       <if test="@Ognl@isNotEmpty(password)">
+				AND PASSWORD = #{password}
+			</if>
+	       <if test="@Ognl@isNotEmpty(craftsmanNo)">
+				AND CRAFTSMAN_NO = #{craftsmanNo}
+			</if>
+	       <if test="@Ognl@isNotEmpty(shopName)">
+				AND SHOP_NAME = #{shopName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(sex)">
+				AND SEX = #{sex}
+			</if>
+	       <if test="@Ognl@isNotEmpty(areaPlatMark)">
+				AND AREA_PLAT_MARK = #{areaPlatMark}
+			</if>
+	       <if test="@Ognl@isNotEmpty(address)">
+				AND ADDRESS = #{address}
+			</if>
+	       <if test="@Ognl@isNotEmpty(mobile)">
+				AND MOBILE = #{mobile}
+			</if>
+	       <if test="@Ognl@isNotEmpty(identityCardNo)">
+				AND IDENTITY_CARD_NO = #{identityCardNo}
+			</if>
+	       <if test="@Ognl@isNotEmpty(cardPositiveImageId)">
+				AND CARD_POSITIVE_IMAGE_ID = #{cardPositiveImageId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(cardOppositeImageId)">
+				AND CARD_OPPOSITE_IMAGE_ID = #{cardOppositeImageId}
+			</if>
+			<if test="@Ognl@isNotEmpty(bgImageId)">
+				AND BG_IMAGE_ID = #{bgImageId}
+			</if>
+			<if test="@Ognl@isNotEmpty(headImageId)">
+				AND HEAD_IMAGE_ID = #{headImageId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(imageServerId)">
+				AND IMAGE_SERVER_ID = #{imageServerId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(email)">
+				AND EMAIL = #{email}
+			</if>
+	       <if test="@Ognl@isNotEmpty(wxId)">
+				AND WX_ID = #{wxId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(weixin)">
+				AND WEIXIN = #{weixin}
+			</if>
+	       <if test="@Ognl@isNotEmpty(qq)">
+				AND QQ = #{qq}
+			</if>
+	       <if test="@Ognl@isNotEmpty(localId)">
+				AND LOCAL_ID = #{localId}
+			</if>
+	       <if test="@Ognl@isNotEmpty(description)">
+				AND DESCRIPTION = #{description}
+			</if>
+	       <if test="@Ognl@isNotEmpty(createTimeBegin)">
+				AND CREATE_TIME >= #{createTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(createTimeEnd)">
+				AND CREATE_TIME &lt;= #{createTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(updateTimeBegin)">
+				AND UPDATE_TIME >= #{updateTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(updateTimeEnd)">
+				AND UPDATE_TIME &lt;= #{updateTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(status)">
+				AND STATUS = #{status}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM craftsman 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="craftsmanResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) as id
+    	</if>
+	    FROM craftsman 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+    <!-- 查询最后一条 -->
+    <select id="findLastCraftsman" resultMap="craftsmanResult">
+    	SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM  craftsman ORDER BY ID desc LIMIT 1 
+	    ]]>
+    </select>
+    
+    <select id="getCustomerByEmailOrMobile" resultMap="craftsmanResult" parameterType="map">
+    	SELECT <include refid="commonColumns" /> 
+    	FROM craftsman WHERE 1=1
+	     AND (MOBILE = #{principal} OR EMAIL = #{principal})
+	    <if test="@Ognl@isNotEmpty(areaPlatMark)">
+	   		AND AREA_PLAT_MARK = #{areaPlatMark} 
+	    </if>
+    </select>
+
+	
+</mapper>
+

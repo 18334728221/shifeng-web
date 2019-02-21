@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- 买家佣金收入日志 -->
+<mapper namespace="LogBuyerCommission">
+	
+	<resultMap id="logBuyerCommissionResult" type="LogBuyerCommission">
+        <result property="id" column="ID"/>
+        <result property="customerNo" column="CUSTOMER_NO"/>
+        <result property="productName" column="PRODUCT_NAME"/>
+        <result property="productCode" column="PRODUCT_CODE"/>
+        <result property="tradeCustomerNo" column="TRADE_CUSTOMER_NO"/>
+        <result property="tradeCustomerName" column="TRADE_CUSTOMER_NAME"/>
+        <result property="amount" column="AMOUNT"/>
+        <result property="rate" column="RATE"/>
+        <result property="income" column="INCOME"/>
+        <result property="nanoTime" column="NANO_TIME"/>
+        <result property="description" column="DESCRIPTION"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="status" column="STATUS"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID,
+        	CUSTOMER_NO,
+        	PRODUCT_NAME,
+        	PRODUCT_CODE,
+        	TRADE_CUSTOMER_NO,
+        	TRADE_CUSTOMER_NAME,
+        	AMOUNT,
+        	RATE,
+        	INCOME,
+        	NANO_TIME,
+        	DESCRIPTION,
+        	CREATE_TIME,
+        	STATUS
+	    ]]>
+	</sql>
+	
+	<sql id="commonAliasColumns">
+	    <![CDATA[
+        	x.ID,
+        	x.CUSTOMER_NO,
+        	x.PRODUCT_NAME,
+        	x.PRODUCT_CODE,
+        	x.TRADE_CUSTOMER_NO,
+        	x.TRADE_CUSTOMER_NAME,
+        	x.AMOUNT,
+        	x.RATE,
+        	x.INCOME,
+        	x.NANO_TIME,
+        	x.DESCRIPTION,
+        	x.CREATE_TIME,
+        	x.STATUS
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" parameterType="LogBuyerCommission">
+        INSERT INTO log_buyer_commission (
+        	CUSTOMER_NO,
+        	PRODUCT_NAME,
+        	PRODUCT_CODE,
+        	TRADE_CUSTOMER_NO,
+        	TRADE_CUSTOMER_NAME,
+        	AMOUNT,
+        	RATE,
+        	INCOME,
+        	NANO_TIME,
+        	DESCRIPTION,
+        	CREATE_TIME,
+        	STATUS
+        ) VALUES (
+        	#{customerNo},
+        	#{productName},
+        	#{productCode},
+        	#{tradeCustomerNo},
+        	#{tradeCustomerName},
+        	#{amount},
+        	#{rate},
+        	#{income},
+        	#{nanoTime},
+        	#{description},
+        	#{createTime},
+        	#{status}
+        )
+     	<selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID() AS ID
+        </selectKey>
+	</insert>
+    
+	<update id="update" parameterType="LogBuyerCommission">
+    <![CDATA[
+        UPDATE log_buyer_commission SET
+	        CUSTOMER_NO = #{customerNo},
+	        PRODUCT_NAME = #{productName},
+	        PRODUCT_CODE = #{productCode},
+	        TRADE_CUSTOMER_NO = #{tradeCustomerNo},
+	        TRADE_CUSTOMER_NAME = #{tradeCustomerName},
+	        AMOUNT = #{amount},
+	        RATE = #{rate},
+	        INCOME = #{income},
+	        NANO_TIME = #{nanoTime},
+	        DESCRIPTION = #{description},
+	        CREATE_TIME = #{createTime},
+	        STATUS = #{status}
+        WHERE 
+	        ID = #{id}
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from log_buyer_commission
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from log_buyer_commission where ID IN 
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach> 
+    </delete>
+    
+    <delete id="batchDeleteByLocalId" parameterType="list">
+        delete from log_buyer_commission where LOCAL_ID in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}		</foreach> 
+    </delete>
+    
+    <select id="getById" resultMap="logBuyerCommissionResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM log_buyer_commission 
+	        WHERE 
+		        ID = #{id}
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="logBuyerCommissionResult">
+		SELECT <include refid="commonColumns" />
+		FROM log_buyer_commission WHERE ID IN 
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(customerNo)">
+				AND CUSTOMER_NO = #{customerNo}
+			</if>
+	       <if test="@Ognl@isNotEmpty(productName)">
+				AND PRODUCT_NAME = #{productName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(productCode)">
+				AND PRODUCT_CODE = #{productCode}
+			</if>
+	       <if test="@Ognl@isNotEmpty(tradeCustomerNo)">
+				AND TRADE_CUSTOMER_NO = #{tradeCustomerNo}
+			</if>
+	       <if test="@Ognl@isNotEmpty(tradeCustomerName)">
+				AND TRADE_CUSTOMER_NAME = #{tradeCustomerName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(amount)">
+				AND AMOUNT = #{amount}
+			</if>
+	       <if test="@Ognl@isNotEmpty(rate)">
+				AND RATE = #{rate}
+			</if>
+	       <if test="@Ognl@isNotEmpty(income)">
+				AND INCOME = #{income}
+			</if>
+	       <if test="@Ognl@isNotEmpty(nanoTime)">
+				AND NANO_TIME = #{nanoTime}
+			</if>
+	       <if test="@Ognl@isNotEmpty(description)">
+				AND DESCRIPTION = #{description}
+			</if>
+	       <if test="@Ognl@isNotEmpty(createTimeBegin)">
+				AND CREATE_TIME >= #{createTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(createTimeEnd)">
+				AND CREATE_TIME &lt;= #{createTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(status)">
+				AND STATUS = #{status}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM log_buyer_commission 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="logBuyerCommissionResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) as id
+    	</if>
+	    FROM log_buyer_commission 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	
+</mapper>
+

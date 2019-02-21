@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+ 
+  	<settings> 		  	  		
+  		<setting name="cacheEnabled" value="false"/> 
+		<setting name="lazyLoadingEnabled" value="false"/>
+		<setting name="aggressiveLazyLoading" value="false"/>  
+		<setting name="multipleResultSetsEnabled" value="true"/> 
+		<setting name="useGeneratedKeys" value="true"/> 
+		<setting name="defaultExecutorType" value="SIMPLE"/> 
+		<setting name="defaultStatementTimeout" value="25000"/> 
+		<!-- 打印查询语句 -->
+        <!-- setting name="logImpl" value="STDOUT_LOGGING" /-->
+  	</settings>
+  	
+  	<!-- 注册类的别名 -->
+  	<typeAliases>
+  		<package name="com.xwd.account.model"/>
+  		<package name="com.xwd.auth.model"/>
+  		<package name="com.xwd.base.model"/>
+  		<package name="com.xwd.customer.model"/>
+  		<package name="com.xwd.dd.model"/>
+  		<package name="com.xwd.evaluate.model"/>
+  		<package name="com.xwd.product.model"/>
+  		<package name="com.xwd.log.model"/>
+  		<package name="com.xwd.mall.model"/>
+  		<package name="com.xwd.trade.model"/>
+  		<package name="com.xwd.msg.model"/>
+  		<package name="com.xwd.seller.model"/>
+  		<package name="com.xwd.interact.model"/>
+  		<package name="com.xwd.securities.model"/>
+  	</typeAliases>
+  	
+  	<typeHandlers>
+  		<typeHandler handler="com.frame.mybatis.CalendarTypeHandler" javaType="java.util.Calendar"/>
+  	</typeHandlers>
+	
+</configuration>

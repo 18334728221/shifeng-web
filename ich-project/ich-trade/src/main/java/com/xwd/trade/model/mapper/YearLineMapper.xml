@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- 年线 -->
+<mapper namespace="YearLine">
+	
+	<resultMap id="yearLineResult" type="YearLine">
+        <result property="id" column="ID"/>
+        <result property="productCode" column="PRODUCT_CODE"/>
+        <result property="openingPrice" column="OPENING_PRICE"/>
+        <result property="closingPrice" column="CLOSING_PRICE"/>
+        <result property="highestPrice" column="HIGHEST_PRICE"/>
+        <result property="lowestPrice" column="LOWEST_PRICE"/>
+        <result property="tradeTime" column="TRADE_TIME"/>
+        <result property="totalAmount" column="TOTAL_AMOUNT"/>
+        <result property="volume" column="VOLUME"/>
+        <result property="priceFluctuation" column="PRICE_FLUCTUATION"/>
+        <result property="turnoverRate" column="TURNOVER_RATE"/>
+        <result property="changePrice" column="CHANGE_PRICE"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID,
+        	PRODUCT_CODE,
+        	OPENING_PRICE,
+        	CLOSING_PRICE,
+        	HIGHEST_PRICE,
+        	LOWEST_PRICE,
+        	TRADE_TIME,
+        	TOTAL_AMOUNT,
+        	VOLUME,
+        	PRICE_FLUCTUATION,
+        	TURNOVER_RATE,
+        	CHANGE_PRICE
+	    ]]>
+	</sql>
+	
+	<sql id="commonAliasColumns">
+	    <![CDATA[
+        	x.ID,
+        	x.PRODUCT_CODE,
+        	x.OPENING_PRICE,
+        	x.CLOSING_PRICE,
+        	x.HIGHEST_PRICE,
+        	x.LOWEST_PRICE,
+        	x.TRADE_TIME,
+        	x.TOTAL_AMOUNT,
+        	x.VOLUME,
+        	x.PRICE_FLUCTUATION,
+        	x.TURNOVER_RATE,
+        	x.CHANGE_PRICE
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="YearLine">
+    <![CDATA[
+        INSERT INTO year_line (
+        	ID,
+        	PRODUCT_CODE,
+        	OPENING_PRICE,
+        	CLOSING_PRICE,
+        	HIGHEST_PRICE,
+        	LOWEST_PRICE,
+        	TRADE_TIME,
+        	TOTAL_AMOUNT,
+        	VOLUME,
+        	PRICE_FLUCTUATION,
+        	TURNOVER_RATE,
+        	CHANGE_PRICE
+        ) VALUES (
+        	#{id},
+        	#{productCode},
+        	#{openingPrice},
+        	#{closingPrice},
+        	#{highestPrice},
+        	#{lowestPrice},
+        	#{tradeTime},
+        	#{totalAmount},
+        	#{volume},
+        	#{priceFluctuation},
+        	#{turnoverRate},
+        	#{changePrice}
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" parameterType="YearLine">
+    <![CDATA[
+        UPDATE year_line SET
+	        PRODUCT_CODE = #{productCode},
+	        OPENING_PRICE = #{openingPrice},
+	        CLOSING_PRICE = #{closingPrice},
+	        HIGHEST_PRICE = #{highestPrice},
+	        LOWEST_PRICE = #{lowestPrice},
+	        TRADE_TIME = #{tradeTime},
+	        TOTAL_AMOUNT = #{totalAmount},
+	        VOLUME = #{volume},
+	        PRICE_FLUCTUATION = #{priceFluctuation},
+	        TURNOVER_RATE = #{turnoverRate},
+	        CHANGE_PRICE = #{changePrice}
+        WHERE 
+	        ID = #{id}
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from year_line
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from year_line where ID IN 
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach> 
+    </delete>
+    
+    <delete id="batchDeleteByLocalId" parameterType="list">
+        delete from year_line where LOCAL_ID in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}		</foreach> 
+    </delete>
+    
+    <select id="getById" resultMap="yearLineResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM year_line 
+	        WHERE 
+		        ID = #{id}
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="yearLineResult">
+		SELECT <include refid="commonColumns" />
+		FROM year_line WHERE ID IN 
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(productCode)">
+				AND PRODUCT_CODE = #{productCode}
+			</if>
+	       <if test="@Ognl@isNotEmpty(openingPrice)">
+				AND OPENING_PRICE = #{openingPrice}
+			</if>
+	       <if test="@Ognl@isNotEmpty(closingPrice)">
+				AND CLOSING_PRICE = #{closingPrice}
+			</if>
+	       <if test="@Ognl@isNotEmpty(highestPrice)">
+				AND HIGHEST_PRICE = #{highestPrice}
+			</if>
+	       <if test="@Ognl@isNotEmpty(lowestPrice)">
+				AND LOWEST_PRICE = #{lowestPrice}
+			</if>
+	       <if test="@Ognl@isNotEmpty(tradeTime)">
+				AND TRADE_TIME = #{tradeTime}
+			</if>
+	       <if test="@Ognl@isNotEmpty(totalAmount)">
+				AND TOTAL_AMOUNT = #{totalAmount}
+			</if>
+	       <if test="@Ognl@isNotEmpty(volume)">
+				AND VOLUME = #{volume}
+			</if>
+	       <if test="@Ognl@isNotEmpty(priceFluctuation)">
+				AND PRICE_FLUCTUATION = #{priceFluctuation}
+			</if>
+	       <if test="@Ognl@isNotEmpty(turnoverRate)">
+				AND TURNOVER_RATE = #{turnoverRate}
+			</if>
+	       <if test="@Ognl@isNotEmpty(changePrice)">
+				AND CHANGE_PRICE = #{changePrice}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM year_line 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="yearLineResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) as id
+    	</if>
+	    FROM year_line 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	<!--  根据属性ID查询最后一条 -->
+    <select id="getLatest" resultMap="yearLineResult" parameterType="map">
+    	SELECT <include refid="commonColumns" />
+	    FROM year_line
+	    WHERE 
+		PRODUCT_CODE = #{productCode} 
+        ORDER BY ID DESC LIMIT 1 
+    </select>
+	
+</mapper>
+

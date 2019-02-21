@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- 顾客邮件表 -->
+<mapper namespace="EmailCustomer">
+	
+	<resultMap id="emailCustomerResult" type="EmailCustomer">
+        <result property="id" column="ID"/>
+        <result property="customerNo" column="CUSTOMER_NO"/>
+        <result property="customerName" column="CUSTOMER_NAME"/>
+        <result property="title" column="TITLE"/>
+        <result property="areaPlatMark" column="AREA_PLAT_MARK"/>
+        <result property="nanoTime" column="NANO_TIME"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="status" column="STATUS"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID,
+        	CUSTOMER_NO,
+        	CUSTOMER_NAME,
+        	TITLE,
+        	AREA_PLAT_MARK,
+        	NANO_TIME,
+        	CREATE_TIME,
+        	STATUS
+	    ]]>
+	</sql>
+	
+	<sql id="commonAliasColumns">
+	    <![CDATA[
+        	x.ID,
+        	x.CUSTOMER_NO,
+        	x.CUSTOMER_NAME,
+        	x.TITLE,
+        	x.AREA_PLAT_MARK,
+        	x.NANO_TIME,
+        	x.CREATE_TIME,
+        	x.STATUS
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="EmailCustomer">
+    <![CDATA[
+        INSERT INTO email_customer (
+        	ID,
+        	CUSTOMER_NO,
+        	CUSTOMER_NAME,
+        	TITLE,
+        	AREA_PLAT_MARK,
+        	NANO_TIME,
+        	CREATE_TIME,
+        	STATUS
+        ) VALUES (
+        	#{id},
+        	#{customerNo},
+        	#{customerName},
+        	#{title},
+        	#{areaPlatMark},
+        	#{nanoTime},
+        	#{createTime},
+        	#{status}
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" parameterType="EmailCustomer">
+    <![CDATA[
+        UPDATE email_customer SET
+	        CUSTOMER_NO = #{customerNo},
+	        CUSTOMER_NAME = #{customerName},
+	        TITLE = #{title},
+	        AREA_PLAT_MARK = #{areaPlatMark},
+	        NANO_TIME = #{nanoTime},
+	        CREATE_TIME = #{createTime},
+	        STATUS = #{status}
+        WHERE 
+	        ID = #{id}
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from email_customer
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from email_customer where ID IN 
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach> 
+    </delete>
+    
+    <delete id="batchDeleteByLocalId" parameterType="list">
+        delete from email_customer where LOCAL_ID in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}		</foreach> 
+    </delete>
+    
+    <select id="getById" resultMap="emailCustomerResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM email_customer 
+	        WHERE 
+		        ID = #{id}
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="emailCustomerResult">
+		SELECT <include refid="commonColumns" />
+		FROM email_customer WHERE ID IN 
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+#{ids}        </foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(customerNo)">
+				AND CUSTOMER_NO = #{customerNo}
+			</if>
+	       <if test="@Ognl@isNotEmpty(customerName)">
+				AND CUSTOMER_NAME = #{customerName}
+			</if>
+	       <if test="@Ognl@isNotEmpty(title)">
+				AND TITLE = #{title}
+			</if>
+	       <if test="@Ognl@isNotEmpty(areaPlatMark)">
+				AND AREA_PLAT_MARK = #{areaPlatMark}
+			</if>
+	       <if test="@Ognl@isNotEmpty(nanoTime)">
+				AND NANO_TIME = #{nanoTime}
+			</if>
+	       <if test="@Ognl@isNotEmpty(createTimeBegin)">
+				AND CREATE_TIME >= #{createTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(createTimeEnd)">
+				AND CREATE_TIME &lt;= #{createTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(status)">
+				AND STATUS = #{status}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM email_customer 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="emailCustomerResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) as id
+    	</if>
+	    FROM email_customer 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	
+</mapper>
+

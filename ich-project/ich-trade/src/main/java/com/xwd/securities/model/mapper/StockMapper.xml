@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<!-- 股票表 -->
+<mapper namespace="Stock">
+	
+	<resultMap id="stockResult" type="Stock">
+        <result property="id" column="ID"/>
+        <result property="code" column="CODE"/>
+        <result property="name" column="NAME"/>
+        <result property="isNew" column="IS_NEW"/>
+        <result property="isSuspended" column="IS_SUSPENDED"/>
+        <result property="price" column="PRICE"/>
+        <result property="rose" column="ROSE"/>
+        <result property="circulatingStock" column="CIRCULATING_STOCK"/>
+        <result property="openingPrice" column="OPENING_PRICE"/>
+        <result property="closingPrice" column="CLOSING_PRICE"/>
+        <result property="highestPrice" column="HIGHEST_PRICE"/>
+        <result property="lowestPrice" column="LOWEST_PRICE"/>
+        <result property="totalAmount" column="TOTAL_AMOUNT"/>
+        <result property="volume" column="VOLUME"/>
+        <result property="priceFluctuation" column="PRICE_FLUCTUATION"/>
+        <result property="amplitude" column="AMPLITUDE"/>
+        <result property="turnoverRate" column="TURNOVER_RATE"/>
+        <result property="changePrice" column="CHANGE_PRICE"/>
+        <result property="outerAmount" column="OUTER_AMOUNT"/>
+        <result property="innerAmount" column="INNER_AMOUNT"/>
+        <result property="createTime" column="CREATE_TIME"/>
+        <result property="updateTime" column="UPDATE_TIME"/>
+        <result property="status" column="STATUS"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="commonColumns">
+	    <![CDATA[
+        	ID,
+        	CODE,
+        	NAME,
+        	IS_NEW,
+        	IS_SUSPENDED,
+        	PRICE,
+        	ROSE,
+        	CIRCULATING_STOCK,
+        	OPENING_PRICE,
+        	CLOSING_PRICE,
+        	HIGHEST_PRICE,
+        	LOWEST_PRICE,
+        	TOTAL_AMOUNT,
+        	VOLUME,
+        	PRICE_FLUCTUATION,
+        	AMPLITUDE,
+        	TURNOVER_RATE,
+        	CHANGE_PRICE,
+        	OUTER_AMOUNT,
+        	INNER_AMOUNT,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STATUS
+	    ]]>
+	</sql>
+	
+	<sql id="commonAliasColumns">
+	    <![CDATA[
+        	x.ID,
+        	x.CODE,
+        	x.NAME,
+        	x.IS_NEW,
+        	x.IS_SUSPENDED,
+        	x.PRICE,
+        	x.ROSE,
+        	x.CIRCULATING_STOCK,
+        	x.OPENING_PRICE,
+        	x.CLOSING_PRICE,
+        	x.HIGHEST_PRICE,
+        	x.LOWEST_PRICE,
+        	x.TOTAL_AMOUNT,
+        	x.VOLUME,
+        	x.PRICE_FLUCTUATION,
+        	x.AMPLITUDE,
+        	x.TURNOVER_RATE,
+        	x.CHANGE_PRICE,
+        	x.OUTER_AMOUNT,
+        	x.INNER_AMOUNT,
+        	x.CREATE_TIME,
+        	x.UPDATE_TIME,
+        	x.STATUS
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="Stock">
+    <![CDATA[
+        INSERT INTO stock (
+        	ID,
+        	CODE,
+        	NAME,
+        	IS_NEW,
+        	IS_SUSPENDED,
+        	PRICE,
+        	ROSE,
+        	CIRCULATING_STOCK,
+        	OPENING_PRICE,
+        	CLOSING_PRICE,
+        	HIGHEST_PRICE,
+        	LOWEST_PRICE,
+        	TOTAL_AMOUNT,
+        	VOLUME,
+        	PRICE_FLUCTUATION,
+        	AMPLITUDE,
+        	TURNOVER_RATE,
+        	CHANGE_PRICE,
+        	OUTER_AMOUNT,
+        	INNER_AMOUNT,
+        	CREATE_TIME,
+        	UPDATE_TIME,
+        	STATUS
+        ) VALUES (
+        	#{id},
+        	#{code},
+        	#{name},
+        	#{isNew},
+        	#{isSuspended},
+        	#{price},
+        	#{rose},
+        	#{circulatingStock},
+        	#{openingPrice},
+        	#{closingPrice},
+        	#{highestPrice},
+        	#{lowestPrice},
+        	#{totalAmount},
+        	#{volume},
+        	#{priceFluctuation},
+        	#{amplitude},
+        	#{turnoverRate},
+        	#{changePrice},
+        	#{outerAmount},
+        	#{innerAmount},
+        	#{createTime},
+        	#{updateTime},
+        	#{status}
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" parameterType="Stock">
+    <![CDATA[
+        UPDATE stock SET
+	        CODE = #{code},
+	        NAME = #{name},
+	        IS_NEW = #{isNew},
+	        IS_SUSPENDED = #{isSuspended},
+	        PRICE = #{price},
+	        ROSE = #{rose},
+	        CIRCULATING_STOCK = #{circulatingStock},
+	        OPENING_PRICE = #{openingPrice},
+	        CLOSING_PRICE = #{closingPrice},
+	        HIGHEST_PRICE = #{highestPrice},
+	        LOWEST_PRICE = #{lowestPrice},
+	        TOTAL_AMOUNT = #{totalAmount},
+	        VOLUME = #{volume},
+	        PRICE_FLUCTUATION = #{priceFluctuation},
+	        AMPLITUDE = #{amplitude},
+	        TURNOVER_RATE = #{turnoverRate},
+	        CHANGE_PRICE = #{changePrice},
+	        OUTER_AMOUNT = #{outerAmount},
+	        INNER_AMOUNT = #{innerAmount},
+	        CREATE_TIME = #{createTime},
+	        UPDATE_TIME = #{updateTime},
+	        STATUS = #{status}
+        WHERE 
+	        ID = #{id}
+    ]]>
+	</update>
+	
+	<delete id="delete" parameterType="map">
+    <![CDATA[
+        delete from stock
+    ]]>
+		<include refid="dynamicWhere"/>
+    </delete>
+    
+    <delete id="batchDelete" parameterType="list">
+        delete from stock where ID IN 
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}        
+		</foreach> 
+    </delete>
+    
+    <delete id="batchDeleteByLocalId" parameterType="list">
+        delete from stock where LOCAL_ID in
+        <foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}		
+		</foreach> 
+    </delete>
+    
+    <select id="getById" resultMap="stockResult">
+		SELECT <include refid="commonColumns" />
+	    <![CDATA[
+		    FROM stock 
+	        WHERE 
+		        ID = #{id}
+	    ]]>
+	</select>
+	
+	<select id="getByIds" resultMap="stockResult">
+		SELECT <include refid="commonColumns" />
+		FROM stock WHERE ID IN 
+		<foreach collection="list" item="ids"  open="(" separator="," close=")">   
+			#{ids}        
+		</foreach>  
+	</select>
+	
+	<sql id="dynamicWhere">
+		<!-- ognl访问静态方法的表达式 为@class@method(args),以下为调用rapid中的Ognl.isNotEmpty()方法,还有其它方法如isNotBlank()可以使用，具体请查看Ognl类 -->
+		<where>	      				
+	       <if test="@Ognl@isNotEmpty(id)">
+				AND ID = #{id}
+			</if>
+	       <if test="@Ognl@isNotEmpty(code)">
+				AND CODE = #{code}
+			</if>
+	       <if test="@Ognl@isNotEmpty(name)">
+				AND NAME = #{name}
+			</if>
+	       <if test="@Ognl@isNotEmpty(isNew)">
+				AND IS_NEW = #{isNew}
+			</if>
+	       <if test="@Ognl@isNotEmpty(isSuspended)">
+				AND IS_SUSPENDED = #{isSuspended}
+			</if>
+	       <if test="@Ognl@isNotEmpty(price)">
+				AND PRICE = #{price}
+			</if>
+			 <if test="@Ognl@isNotEmpty(rose)">
+				AND ROSE = #{rose}
+			</if>
+	       <if test="@Ognl@isNotEmpty(circulatingStock)">
+				AND CIRCULATING_STOCK = #{circulatingStock}
+			</if>
+	       <if test="@Ognl@isNotEmpty(openingPrice)">
+				AND OPENING_PRICE = #{openingPrice}
+			</if>
+	       <if test="@Ognl@isNotEmpty(closingPrice)">
+				AND CLOSING_PRICE = #{closingPrice}
+			</if>
+	       <if test="@Ognl@isNotEmpty(highestPrice)">
+				AND HIGHEST_PRICE = #{highestPrice}
+			</if>
+	       <if test="@Ognl@isNotEmpty(lowestPrice)">
+				AND LOWEST_PRICE = #{lowestPrice}
+			</if>
+	       <if test="@Ognl@isNotEmpty(totalAmount)">
+				AND TOTAL_AMOUNT = #{totalAmount}
+			</if>
+	       <if test="@Ognl@isNotEmpty(volume)">
+				AND VOLUME = #{volume}
+			</if>
+	       <if test="@Ognl@isNotEmpty(priceFluctuation)">
+				AND PRICE_FLUCTUATION = #{priceFluctuation}
+			</if>
+	       <if test="@Ognl@isNotEmpty(turnoverRate)">
+				AND TURNOVER_RATE = #{turnoverRate}
+			</if>
+	       <if test="@Ognl@isNotEmpty(changePrice)">
+				AND CHANGE_PRICE = #{changePrice}
+			</if>
+	       <if test="@Ognl@isNotEmpty(outerAmount)">
+				AND OUTER_AMOUNT = #{outerAmount}
+			</if>
+	       <if test="@Ognl@isNotEmpty(innerAmount)">
+				AND INNER_AMOUNT = #{innerAmount}
+			</if>
+	       <if test="@Ognl@isNotEmpty(createTimeBegin)">
+				AND CREATE_TIME >= #{createTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(createTimeEnd)">
+				AND CREATE_TIME &lt;= #{createTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(updateTimeBegin)">
+				AND UPDATE_TIME >= #{updateTimeBegin}
+		   </if>
+		   <if test="@Ognl@isNotEmpty(updateTimeEnd)">
+				AND UPDATE_TIME &lt;= #{updateTimeEnd}
+		   </if>
+	       <if test="@Ognl@isNotEmpty(status)">
+				AND STATUS = #{status}
+			</if>
+		</where>
+	</sql>
+		
+    <select id="count" resultType="long">
+        SELECT count(*) FROM stock 
+		<include refid="dynamicWhere"/>    
+    </select>
+    
+    <!--
+    	分页查询已经使用Dialect进行分页,也可以不使用Dialect直接编写分页
+    	因为分页查询将传 offset,pageSize,lastRows 三个参数,不同的数据库可以根于此三个参数属性应用不同的分页实现
+    -->
+    <select id="pageSelect" resultMap="stockResult">
+    	SELECT 
+    	<if test="@Ognl@isEmpty(count)">
+    		<include refid="commonColumns" />
+    	</if>
+    	<if test="@Ognl@isNotEmpty(count)">
+    		count(*) as id
+    	</if>
+	    FROM stock 
+		<include refid="dynamicWhere"/>
+		
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	
+</mapper>
+
